@@ -1,4 +1,4 @@
-<?php //include 'includes/header.php'; ?>
+<?php include 'includes/cabecera.php'; ?>
 
 <main class="contenedor-registro">
     <h2>Crear cuenta en CardCollectors</h2>
@@ -29,5 +29,5 @@
     
     <p>¿Ya tienes cuenta? <a href="login.php">Inicia sesión aquí</a></p>
 </main>
-<?php //include 'includes/footer.php'; ?>
+<?php include 'includes/pie.php'; ?>
 <!-- Página de registro del sitio web -->

@@ -39,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bind_param("sss", $nombre, $email, $password_hash);
 
             if ($stmt->execute()) {
+                //Mensaje de éxito y redirección
                 echo "<script>alert('¡usuario registrado con éxito!'); window.location.href='login.php';</script>";
             } else {
                 echo "Error al registrar: " . $conn->error;

@@ -1,4 +1,5 @@
 -- Crear la base de datos
+DROP DATABASE IF EXISTS TiendaColeccionismo; -- Para pruebas, eliminar si ya existe
 CREATE DATABASE IF NOT EXISTS TiendaColeccionismo;
 USE TiendaColeccionismo;
 
@@ -11,12 +12,12 @@ CREATE TABLE Usuario (
     rol ENUM('usuario', 'admin') DEFAULT 'usuario'
 ) COMMENT='Registro central de usuarios y sus roles de acceso';
 
--- Tabla Categoria
+-- Tabla Categoria (CAMBIO CLAVE: Sin UNIQUE en nombre_categoria)
 CREATE TABLE Categoria (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_categoria ENUM('Cartas', 'Figuras', 'Libros') NOT NULL UNIQUE,
+    nombre_categoria VARCHAR(50) NOT NULL,
     tipo_libro ENUM('Manga','Comic','Novela') DEFAULT NULL
-) COMMENT='Clasificación fija de productos según el diseño de la tienda';
+) COMMENT='Clasificación de productos (Permite sub-tipos de Libros)';
 
 -- Tabla Producto
 CREATE TABLE Producto (
@@ -78,19 +79,25 @@ CREATE TABLE Administrador (
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 ) COMMENT='Relación adicional para identificar usuarios con privilegios administrativos';
 
--- 1. Categorías detalladas: Ahora "Libros" tiene sus 3 variantes
-INSERT IGNORE INTO Categoria (nombre_categoria, tipo_libro) VALUES 
-('Cartas', NULL),
-('Figuras', NULL),
-('Libros', 'Manga'),
-('Libros', 'Comic'),
-('Libros', 'Novela');
+-- ==========================================================
+-- INSERCIÓN DE DATOS INICIALES
+-- ==========================================================
 
--- 2. Usuario Administrador (Vital para que puedas entrar al panel)
--- Sin un usuario con rol 'admin', el sistema no te dejará ver admin_productos.php
-INSERT IGNORE INTO Usuario (id_usuario, nombre, email, password, rol) 
+-- 1. Categorías detalladas
+INSERT INTO Categoria (id_categoria, nombre_categoria, tipo_libro) VALUES 
+(1, 'Cartas', NULL),
+(2, 'Figuras', NULL),
+(3, 'Libros', 'Manga'),
+(4, 'Libros', 'Comic'),
+(5, 'Libros', 'Novela');
+
+-- 2. Usuario Administrador 
+INSERT INTO Usuario (id_usuario, nombre, email, password, rol) 
 VALUES (1, 'Administrador', 'admin@tienda.com', 'admin123', 'admin');
 
--- 3. Producto de prueba vinculado a 'Cartas' (id_categoria 1) y al usuario (id_vendedor 1)
-INSERT IGNORE INTO Producto (id_producto, nombre, descripcion, id_categoria, precio, stock, estado, id_vendedor) 
-VALUES (1, 'Baraja Pokémon', 'Pack de inicio', 1, 19.99, 10, 'activo', 1);
+-- 3. Vincular a la tabla Administrador
+INSERT INTO Administrador (id_usuario) VALUES (1);
+
+-- 4. Producto de prueba
+INSERT INTO Producto (nombre, descripcion, id_categoria, precio, stock, estado, id_vendedor) 
+VALUES ('Baraja Pokémon', 'Pack de inicio', 1, 19.99, 10, 'activo', 1);

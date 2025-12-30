@@ -78,12 +78,19 @@ CREATE TABLE Administrador (
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 ) COMMENT='Relación adicional para identificar usuarios con privilegios administrativos';
 
--- Inserción de categorías (con IGNORE para evitar errores de duplicado)
-INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Cartas');
-INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Figuras');
-INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Libros');
+-- 1. Categorías detalladas: Ahora "Libros" tiene sus 3 variantes
+INSERT IGNORE INTO Categoria (nombre_categoria, tipo_libro) VALUES 
+('Cartas', NULL),
+('Figuras', NULL),
+('Libros', 'Manga'),
+('Libros', 'Comic'),
+('Libros', 'Novela');
 
--- Producto de prueba corregido
-INSERT IGNORE INTO Producto (id_producto, nombre, descripcion, id_categoria, precio, stock, estado) 
-VALUES (1, 'Producto de Prueba', 'Esta es una descripción de prueba', 1, 9.99, 10, 'activo');
+-- 2. Usuario Administrador (Vital para que puedas entrar al panel)
+-- Sin un usuario con rol 'admin', el sistema no te dejará ver admin_productos.php
+INSERT IGNORE INTO Usuario (id_usuario, nombre, email, password, rol) 
+VALUES (1, 'Administrador', 'admin@tienda.com', 'admin123', 'admin');
 
+-- 3. Producto de prueba vinculado a 'Cartas' (id_categoria 1) y al usuario (id_vendedor 1)
+INSERT IGNORE INTO Producto (id_producto, nombre, descripcion, id_categoria, precio, stock, estado, id_vendedor) 
+VALUES (1, 'Baraja Pokémon', 'Pack de inicio', 1, 19.99, 10, 'activo', 1);

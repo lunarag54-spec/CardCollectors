@@ -78,11 +78,12 @@ CREATE TABLE Administrador (
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 ) COMMENT='Relación adicional para identificar usuarios con privilegios administrativos';
 
--- Inserción de categorías base para el funcionamiento del catálogo
-INSERT INTO Categoria (nombre_categoria) VALUES ('Cartas');
-INSERT INTO Categoria (nombre_categoria) VALUES ('Figuras');
-INSERT INTO Categoria (nombre_categoria) VALUES ('Libros');
+-- Inserción de categorías (con IGNORE para evitar errores de duplicado)
+INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Cartas');
+INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Figuras');
+INSERT IGNORE INTO Categoria (nombre_categoria) VALUES ('Libros');
 
---Producto de prueba para verificar que la tabla de admin carga datos
-INSERT INTO Producto (nombre, descripcion, id_categoria, precio, stock, estado) 
-VALUES ('Producto de Prueba', 'Esta es una descripción de prueba', 1, 9.99, 10, 'activo');
+-- Producto de prueba corregido
+INSERT IGNORE INTO Producto (id_producto, nombre, descripcion, id_categoria, precio, stock, estado) 
+VALUES (1, 'Producto de Prueba', 'Esta es una descripción de prueba', 1, 9.99, 10, 'activo');
+

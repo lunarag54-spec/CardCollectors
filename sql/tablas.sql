@@ -77,3 +77,12 @@ CREATE TABLE Administrador (
     id_usuario INT,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 ) COMMENT='Relación adicional para identificar usuarios con privilegios administrativos';
+
+-- Inserción de categorías base para el funcionamiento del catálogo
+INSERT INTO Categoria (nombre_categoria) VALUES ('Cartas');
+INSERT INTO Categoria (nombre_categoria) VALUES ('Figuras');
+INSERT INTO Categoria (nombre_categoria) VALUES ('Libros');
+
+--Producto de prueba para verificar que la tabla de admin carga datos
+INSERT INTO Producto (nombre, descripcion, id_categoria, precio, stock, estado) 
+VALUES ('Producto de Prueba', 'Esta es una descripción de prueba', 1, 9.99, 10, 'activo');

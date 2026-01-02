@@ -39,13 +39,15 @@ $resultado_inventario = $conn->query($query_inventario);
     <!-- Seccion para añadir un producto al inventario -->
     <section id="alta-producto" class="seccion-admin" style="margin-top: 20px; border: 1px solid #ccc; padding: 20px;">
         <h3>Añadir Nuevo Producto</h3>
-        <!-- Mensaje de éxito añadir/borrar producto -->
+        <!-- Mensaje de éxito añadido/borrado/actualizado -->
         <?php if (isset($_GET['msg'])) : ?>
             <?php if ($_GET['msg'] == 'ok'): ?>
                 <p style="color: green;">Producto añadido correctamente.</p>
             <?php elseif ($_GET['msg'] == 'deleted'): ?>
                 <p style="color: orange;">Producto elimnado.</p>
-            <?php endif; ?>
+            <?php elseif ($_GET['msg'] == 'updated'): ?>
+                <p style="color: blue;">Producto actualizado correctamente.</p>
+    <?php endif; ?>
         <?php endif; ?>
 
         <form action="procesar_producto.php" method="POST">
@@ -121,7 +123,11 @@ $resultado_inventario = $conn->query($query_inventario);
                             </td>
                             <td><?php echo $row['precio']; ?>€</td>
                             <td><?php echo $row['stock']; ?></td>
+                                
                             <td>
+                                <a href="editar_producto.php?id=<?php echo $row['id_producto']; ?>">
+                                    Editar -
+                                </a>
                                 <a href="eliminar_producto.php?id=<?php echo $row['id_producto']; ?>" 
                                    onclick="return confirm('¿Seguro que quieres eliminar este producto?');">
                                    Eliminar

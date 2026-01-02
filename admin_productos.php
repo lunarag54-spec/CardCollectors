@@ -18,9 +18,17 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
 include 'includes/cabecera.php';
 require_once 'includes/conexion.php';
 
-// MODIFICACIÓN: Ahora pedimos también el tipo_libro
+// Consulta para el desplegable de categorías
 $query_categorias = "SELECT id_categoria, nombre_categoria, tipo_libro FROM Categoria";
 $resultado_categorias = $conn->query($query_categorias);
+
+// Solo traemos los que están 'activos' para cumplir con el borrado lógico
+$query_inventario = "SELECT p.*, c.nombre_categoria, c.tipo_libro 
+                     FROM Producto p 
+                     INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
+                     WHERE p.estado = 'activo' 
+                     ORDER BY p.id_producto DESC";
+$resultado_inventario = $conn->query($query_inventario);
 ?>
 
 <main class="contenedor">
@@ -28,14 +36,16 @@ $resultado_categorias = $conn->query($query_categorias);
         <h2>Panel de Administración</h2>
         <p>Gestión de Inventario - Acceso Restringido</p>
     </div>
-
+    <!-- Seccion para añadir un producto al inventario -->
     <section id="alta-producto" class="seccion-admin" style="margin-top: 20px; border: 1px solid #ccc; padding: 20px;">
         <h3>Añadir Nuevo Producto</h3>
-        <!-- Mensaje de éxito -->
-        <?php if (isset($_GET['msg']) && $_GET['msg'] == 'ok'): ?>
-            <div style="background-color: #d4edda; color: #155724; padding: 15px; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 20px;">
-                <strong>¡Éxito!</strong> El producto se ha añadido correctamente al inventario.
-            </div>
+        <!-- Mensaje de éxito añadir/borrar producto -->
+        <?php if (isset($_GET['msg'])) : ?>
+            <?php if ($_GET['msg'] == 'ok'): ?>
+                <p style="color: green;">Producto añadido correctamente.</p>
+            <?php elseif ($_GET['msg'] == 'deleted'): ?>
+                <p style="color: orange;">Producto elimnado.</p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <form action="procesar_producto.php" method="POST">
@@ -57,7 +67,7 @@ $resultado_categorias = $conn->query($query_categorias);
                     if ($resultado_categorias && $resultado_categorias->num_rows > 0):
                         while ($cat = $resultado_categorias->fetch_assoc()):
 
-                            // LÓGICA NUEVA: Construir el nombre a mostrar
+                            //Construir el nombre a mostrar
                             $nombre_option = $cat['nombre_categoria'];
                             if (!empty($cat['tipo_libro'])) {
                                 $nombre_option .= " (" . $cat['tipo_libro'] . ")";
@@ -86,6 +96,44 @@ $resultado_categorias = $conn->query($query_categorias);
                 Guardar Producto
             </button>
         </form>
+    </section>
+    <!-- Seccion que mostrara el inventario y que servira para actualizar el estado de un prodcuto -->
+    <section id="inventario" style="margin-top: 30px;">
+        <h3>Inventario Actual</h3>
+        <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($resultado_inventario && $resultado_inventario->num_rows > 0): ?>
+                    <?php while($row = $resultado_inventario->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo $row['nombre']; ?></td>
+                            <td>
+                                <?php echo $row['nombre_categoria']; ?> 
+                                <?php echo (!empty($row['tipo_libro'])) ? "({$row['tipo_libro']})" : ""; ?>
+                            </td>
+                            <td><?php echo $row['precio']; ?>€</td>
+                            <td><?php echo $row['stock']; ?></td>
+                            <td>
+                                <a href="eliminar_producto.php?id=<?php echo $row['id_producto']; ?>" 
+                                   onclick="return confirm('¿Seguro que quieres eliminar este producto?');">
+                                   Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr><td colspan="5">No hay productos activos.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
     </section>
 </main>
 

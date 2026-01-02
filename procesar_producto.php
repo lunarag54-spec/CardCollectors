@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($conn->query($sql) === TRUE) {
         // Redirigimos de vuelta con un parámetro de éxito
         header("Location: admin_productos.php?msg=ok");
+        exit();
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

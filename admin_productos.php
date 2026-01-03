@@ -39,7 +39,7 @@ $resultado_inventario = $conn->query($query_inventario);
     <!-- Seccion para añadir un producto al inventario -->
     <section id="alta-producto" class="seccion-admin" style="margin-top: 20px; border: 1px solid #ccc; padding: 20px;">
         <h3>Añadir Nuevo Producto</h3>
-        <!-- Mensaje de éxito añadido/borrado/actualizado -->
+        <!-- Mensaje de éxito añadido/borrado/actualizado o error -->
         <?php if (isset($_GET['msg'])) : ?>
             <?php if ($_GET['msg'] == 'ok'): ?>
                 <p style="color: green;">Producto añadido correctamente.</p>
@@ -47,6 +47,12 @@ $resultado_inventario = $conn->query($query_inventario);
                 <p style="color: orange;">Producto elimnado.</p>
             <?php elseif ($_GET['msg'] == 'updated'): ?>
                 <p style="color: blue;">Producto actualizado correctamente.</p>
+            <?php elseif ($_GET['msg'] == 'err_nombre'): ?>
+                 <p style="color: red;">El nombre del producto es obligatorio.</p>
+            <?php elseif ($_GET['msg'] == 'err_precio'): ?>
+                <p style="color: red;">El precio debe ser un número positivo.</p>
+            <?php elseif ($_GET['msg'] == 'err_stock'): ?>
+                <p style="color: red;">El stock no puede ser un número negativo.</p>
     <?php endif; ?>
         <?php endif; ?>
 

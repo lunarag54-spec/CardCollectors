@@ -1,3 +1,49 @@
+<?php
+// 1. Iniciar sesión y conectar a la base de datos
+session_start();
+require_once 'includes/conexion.php';
+
+// 2. Comprobar si ya existe una sesión (para no loguearse dos veces)
+if (isset($_SESSION['id_usuario'])) {
+    header("Location: index.php");
+    exit();
+}
+
+// 3. Procesar el formulario cuando se hace POST
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Escapamos los datos para evitar inyecciones básicas
+    $email = mysqli_real_escape_string($conn, $_POST['user']);
+    $password = $_POST['pass'];
+
+    // Consultamos si el email existe
+    $sql = "SELECT id_usuario, nombre, password, rol FROM usuario WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $usuario = $result->fetch_assoc();
+
+        // Verificamos la contraseña encriptada
+        if ($password === $usuario['password']) {
+            // Guardamos datos en la sesión
+            $_SESSION['id_usuario'] = $usuario['id_usuario'];
+            $_SESSION['nombre'] = $usuario['nombre'];
+            $_SESSION['rol'] = $usuario['rol'];
+
+            // Redirigimos al index
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = "Contraseña incorrecta";
+        }
+    } else {
+        $error = "El usuario no existe";
+    }
+    $stmt->close();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,7 +64,14 @@
                     <span class="rarity">ULTRA RARE</span>
                 </div>
                 
-                <form action="login_process.php" method="POST">
+                <form action="login.php" method="POST">
+                    
+                    <?php if(isset($error)): ?>
+                        <p style="color: #ff0000; text-align: center; margin-bottom: 10px; font-size: 0.8rem;">
+                            <?php echo $error; ?>
+                        </p>
+                    <?php endif; ?>
+
                     <div class="input-group">
                         <input type="text" name="user" required>
                         <label>Usuario / Email</label>

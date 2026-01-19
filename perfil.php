@@ -25,32 +25,32 @@ if ($usuario = $resultado->fetch_assoc()) {
 include 'includes/cabecera.php'; 
 ?>
 
-<main class="contenedor">
-    <div class="perfil-container" style="max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center; color: #333; margin-bottom: 25px;">Perfil de Usuario</h2>
+<link rel="stylesheet" href="css/usuarios.css">
+
+<main class="contenedor-perfil">
+    <div class="card-usuario">
+        <h2 class="titulo-perfil">Perfil de Usuario</h2>
         
-        <div class="perfil-info" style="border-top: 1px solid #eee; padding-top: 20px;">
-            <p style="margin-bottom: 15px;">
-                <strong style="color: #666;">Nombre Completo:</strong><br>
-                <span style="font-size: 1.1em; color: #333;"><?php echo htmlspecialchars($nombre); ?></span>
-            </p>
+        <div class="perfil-info">
+            <div class="dato-grupo">
+                <strong class="dato-label">Nombre Completo:</strong>
+                <span class="dato-valor"><?php echo htmlspecialchars($nombre); ?></span>
+            </div>
             
-            <p style="margin-bottom: 15px;">
-                <strong style="color: #666;">Correo Electrónico:</strong><br>
-                <span style="font-size: 1.1em; color: #333;"><?php echo htmlspecialchars($email); ?></span>
-            </p>
+            <div class="dato-grupo">
+                <strong class="dato-label">Correo Electrónico:</strong>
+                <span class="dato-valor"><?php echo htmlspecialchars($email); ?></span>
+            </div>
             
-            <p style="margin-bottom: 25px;">
-                <strong style="color: #666;">Rol de Usuario:</strong><br>
-                <span style="display: inline-block; padding: 4px 12px; background: #f0f4f8; color: #1a73e8; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 0.85em;">
-                    <?php echo htmlspecialchars($rol); ?>
-                </span>
-            </p>
+            <div class="dato-grupo">
+                <strong class="dato-label">Rol de Usuario:</strong>
+                <span class="badge-rol"><?php echo htmlspecialchars($rol); ?></span>
+            </div>
         </div>
 
-        <div class="perfil-acciones" style="display: flex; gap: 10px;">
-            <a href="editar_perfil.php" style="flex: 1; text-align: center; background: #4CAF50; color: white; padding: 12px; border-radius: 4px; text-decoration: none; font-weight: bold;">Editar Información</a>
-            <a href="logout.php" style="flex: 1; text-align: center; background: #f44336; color: white; padding: 12px; border-radius: 4px; text-decoration: none; font-weight: bold;">Cerrar Sesión</a>
+        <div class="perfil-acciones">
+            <a href="editar_perfil.php" class="btn btn-primario">Editar Información</a>
+            <a href="logout.php" class="btn btn-peligro">Cerrar Sesión</a>
         </div>
     </div>
 </main>

@@ -212,7 +212,6 @@ $items_en_carrito = 0;
     <p>Contenido de la página aquí.</p>
 </main>
 <!-- ===== FOOTER ===== -->
-<!-- ===== FOOTER ===== -->
  <footer class="main-footer animated-border">
      <div class="footer-content">
 
@@ -229,7 +228,6 @@ $items_en_carrito = 0;
                 <a href="#">@Card_Collectors<i class="fab fa-facebook-f"></i></a>
             </div>
         </div>
-                    <div></div>
     </div>
 
     <div class="footer-bottom">

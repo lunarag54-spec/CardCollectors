@@ -239,6 +239,7 @@ body::after { background: #00d4ff; bottom: -10%; right: -10%; } /* Brillo Azul *
                     <?= number_format($subtotal, 2); ?> €
                 </div>
             </div>
+            <div></div>
         <?php endforeach; ?>
 
         <div class="total-carrito">

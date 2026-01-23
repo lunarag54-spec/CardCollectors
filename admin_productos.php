@@ -1,152 +1,226 @@
 <?php
-//Iniciamos sesión para verificar el rol del usuario
+// 1. Seguridad de Sesión
 session_start();
 
-/**
- * CONTROL DE ACCESO
- * Verificamos si existe la sesión y si el rol es 'admin'.
- * Nota: Por ahora, mientras probamos, si te redirige al login, 
- * se pueden comentar estas líneas (del 12 al 15).
- */
-/*
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'admin') {
+// Si no hay sesión, al login
+if (!isset($_SESSION['id_usuario'])) {
     header("Location: login.php");
-    exit(); // Detiene la carga del resto de la página
+    exit();
 }
-    */
 
-include 'includes/cabecera.php';
+include 'includes/header.php'; // Usamos el header con el botón "Subir Reliquia"
 require_once 'includes/conexion.php';
 
-// Consulta para el desplegable de categorías
-$query_categorias = "SELECT id_categoria, nombre_categoria, tipo_libro FROM Categoria";
-$resultado_categorias = $conn->query($query_categorias);
+$id_user = $_SESSION['id_usuario'];
 
-// Solo traemos los que están 'activos' para cumplir con el borrado lógico
+// 2. Consulta para el inventario filtrado por el vendedor logueado
+// Así garantizamos que un usuario no pueda editar o ver productos de otros
 $query_inventario = "SELECT p.*, c.nombre_categoria, c.tipo_libro 
                      FROM Producto p 
                      INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
-                     WHERE p.estado = 'activo' 
+                     WHERE p.estado = 'activo' AND p.id_vendedor = ?
                      ORDER BY p.id_producto DESC";
-$resultado_inventario = $conn->query($query_inventario);
+
+$stmt = $conn->prepare($query_inventario);
+$stmt->bind_param("i", $id_user);
+$stmt->execute();
+$resultado_inventario = $stmt->get_result();
 ?>
 
-<main class="contenedor">
+<style>
+    .admin-container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .admin-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .admin-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--accent-blue);
+        text-shadow: 0 0 10px var(--accent-blue);
+        letter-spacing: 2px;
+        margin-bottom: 5px;
+    }
+
+    .admin-header p {
+        color: #666;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    /* Estilo de la Tabla Estilo Cyberpunk */
+    .tabla-reliquias {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px; /* Espacio entre filas */
+        margin-top: 20px;
+    }
+
+    .tabla-reliquias th {
+        color: var(--accent-blue);
+        text-transform: uppercase;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.8rem;
+        padding: 15px;
+        text-align: left;
+        border-bottom: 2px solid #222;
+    }
+
+    .fila-reliquia {
+        background: rgba(255, 255, 255, 0.03);
+        transition: all 0.3s ease;
+    }
+
+    .fila-reliquia:hover {
+        background: rgba(0, 212, 255, 0.08);
+        transform: scale(1.01);
+    }
+
+    .fila-reliquia td {
+        padding: 20px 15px;
+        color: #eee;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .img-mini {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 5px;
+        border: 1px solid #333;
+    }
+
+    .badge-cat {
+        background: #1a1a1a;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        border: 1px solid #333;
+    }
+
+    .precio-tag {
+        color: #00ff88;
+        font-weight: bold;
+        font-family: 'Orbitron';
+    }
+
+    /* Botones de acción */
+    .btn-accion {
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        font-family: 'Orbitron';
+        transition: 0.3s;
+        display: inline-block;
+        margin-right: 5px;
+    }
+
+    .btn-editar {
+        border: 1px solid var(--accent-blue);
+        color: var(--accent-blue);
+    }
+
+    .btn-editar:hover {
+        background: var(--accent-blue);
+        color: #000;
+    }
+
+    .btn-eliminar {
+        border: 1px solid var(--accent-red);
+        color: var(--accent-red);
+    }
+
+    .btn-eliminar:hover {
+        background: var(--accent-red);
+        color: #fff;
+    }
+
+    /* Mensajes flotantes */
+    .alert {
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-family: 'Orbitron';
+        font-size: 0.8rem;
+    }
+    .alert-success { background: rgba(0, 255, 136, 0.1); color: #00ff88; border: 1px solid #00ff88; }
+    .alert-error { background: rgba(255, 0, 0, 0.1); color: #ff0000; border: 1px solid #ff0000; }
+</style>
+
+<main class="admin-container">
     <div class="admin-header">
-        <h2>Panel de Administración</h2>
-        <p>Gestión de Inventario - Acceso Restringido</p>
+        <h2>GESTIÓN DE INVENTARIO</h2>
+        <p>Tus reliquias activas en el mercado</p>
     </div>
-    <!-- Seccion para añadir un producto al inventario -->
-    <section id="alta-producto" class="seccion-admin" style="margin-top: 20px; border: 1px solid #ccc; padding: 20px;">
-        <h3>Añadir Nuevo Producto</h3>
-        <!-- Mensaje de éxito añadido/borrado/actualizado o error -->
-        <?php if (isset($_GET['msg'])) : ?>
-            <?php if ($_GET['msg'] == 'ok'): ?>
-                <p style="color: green;">Producto añadido correctamente.</p>
-            <?php elseif ($_GET['msg'] == 'deleted'): ?>
-                <p style="color: orange;">Producto elimnado.</p>
-            <?php elseif ($_GET['msg'] == 'updated'): ?>
-                <p style="color: blue;">Producto actualizado correctamente.</p>
-            <?php elseif ($_GET['msg'] == 'err_nombre'): ?>
-                 <p style="color: red;">El nombre del producto es obligatorio.</p>
-            <?php elseif ($_GET['msg'] == 'err_precio'): ?>
-                <p style="color: red;">El precio debe ser un número positivo.</p>
-            <?php elseif ($_GET['msg'] == 'err_stock'): ?>
-                <p style="color: red;">El stock no puede ser un número negativo.</p>
+
+    <?php if (isset($_GET['msg'])): ?>
+        <div class="alert <?= ($_GET['msg'] == 'ok' || $_GET['msg'] == 'updated') ? 'alert-success' : 'alert-error' ?>">
+            <?php
+                if ($_GET['msg'] == 'ok') echo "Sincronización completa: Reliquia forjada con éxito.";
+                if ($_GET['msg'] == 'updated') echo "Datos actualizados en el núcleo.";
+                if ($_GET['msg'] == 'deleted') echo "Reliquia retirada del mercado.";
+            ?>
+        </div>
     <?php endif; ?>
-        <?php endif; ?>
 
-        <form action="procesar_producto.php" method="POST">
-            <div style="margin-bottom: 10px;">
-                <label>Nombre del Producto:</label><br>
-                <input type="text" name="nombre" required style="width: 100%;">
-            </div>
-
-            <div style="margin-bottom: 10px;">
-                <label>Descripción:</label><br>
-                <textarea name="descripcion" rows="3" style="width: 100%;"></textarea>
-            </div>
-
-            <div style="margin-bottom: 10px;">
-                <label>Categoría:</label><br>
-                <select name="id_categoria" required style="width: 100%;">
-                    <option value="">-- Selecciona --</option>
-                    <?php
-                    if ($resultado_categorias && $resultado_categorias->num_rows > 0):
-                        while ($cat = $resultado_categorias->fetch_assoc()):
-
-                            //Construir el nombre a mostrar
-                            $nombre_option = $cat['nombre_categoria'];
-                            if (!empty($cat['tipo_libro'])) {
-                                $nombre_option .= " (" . $cat['tipo_libro'] . ")";
-                            }
-                    ?>
-                            <option value="<?php echo $cat['id_categoria']; ?>">
-                                <?php echo $nombre_option; ?>
-                            </option>
-                    <?php endwhile;
-                    endif; ?>
-                </select>
-            </div>
-
-            <div style="display: flex; gap: 20px; margin-bottom: 10px;">
-                <div style="flex: 1;">
-                    <label>Precio (€):</label><br>
-                    <input type="number" name="precio" step="0.01" required style="width: 100%;">
-                </div>
-                <div style="flex: 1;">
-                    <label>Stock:</label><br>
-                    <input type="number" name="stock" value="1" required style="width: 100%;">
-                </div>
-            </div>
-
-            <button type="submit" style="background: green; color: white; padding: 10px 20px; border: none; cursor: pointer;">
-                Guardar Producto
-            </button>
-        </form>
-    </section>
-    <!-- Seccion que mostrara el inventario y que servira para actualizar el estado de un prodcuto -->
-    <section id="inventario" style="margin-top: 30px;">
-        <h3>Inventario Actual</h3>
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead>
+    <table class="tabla-reliquias">
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre de la Reliquia</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if ($resultado_inventario->num_rows > 0): ?>
+                <?php while($row = $resultado_inventario->fetch_assoc()): ?>
+                    <tr class="fila-reliquia">
+                        <td>
+                            <img src="img/productos/<?= $row['imagen'] ?>" class="img-mini" onerror="this.src='img/productos/default.jpg'">
+                        </td>
+                        <td style="font-weight: bold;"><?= htmlspecialchars($row['nombre']) ?></td>
+                        <td>
+                            <span class="badge-cat">
+                                <?= $row['nombre_categoria'] ?> 
+                                <?= (!empty($row['tipo_libro'])) ? "({$row['tipo_libro']})" : "" ?>
+                            </span>
+                        </td>
+                        <td class="precio-tag"><?= number_format($row['precio'], 2) ?>€</td>
+                        <td><?= $row['stock'] ?> uds.</td>
+                        <td>
+                            <a href="editar_producto.php?id=<?= $row['id_producto'] ?>" class="btn-accion btn-editar">
+                                <i class="fas fa-edit"></i> EDITAR
+                            </a>
+                            <a href="eliminar_producto.php?id=<?= $row['id_producto'] ?>" 
+                               class="btn-accion btn-eliminar" 
+                               onclick="return confirm('¿Retirar esta reliquia del mercado permanentemente?');">
+                                <i class="fas fa-trash"></i> RETIRAR
+                            </a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            <?php else: ?>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th>Acciones</th>
+                    <td colspan="6" style="text-align: center; padding: 50px; color: #555;">
+                        <i class="fas fa-box-open" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                        Aún no has subido ninguna reliquia.
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php if ($resultado_inventario && $resultado_inventario->num_rows > 0): ?>
-                    <?php while($row = $resultado_inventario->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo $row['nombre']; ?></td>
-                            <td>
-                                <?php echo $row['nombre_categoria']; ?> 
-                                <?php echo (!empty($row['tipo_libro'])) ? "({$row['tipo_libro']})" : ""; ?>
-                            </td>
-                            <td><?php echo $row['precio']; ?>€</td>
-                            <td><?php echo $row['stock']; ?></td>
-                                
-                            <td>
-                                <a href="editar_producto.php?id=<?php echo $row['id_producto']; ?>">
-                                    Editar -
-                                </a>
-                                <a href="eliminar_producto.php?id=<?php echo $row['id_producto']; ?>" 
-                                   onclick="return confirm('¿Seguro que quieres eliminar este producto?');">
-                                   Eliminar
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <tr><td colspan="5">No hay productos activos.</td></tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </section>
+            <?php endif; ?>
+        </tbody>
+    </table>
 </main>
 
 <?php include 'includes/pie.php'; ?>

@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #020202; /* Negro casi puro */
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    perspective: 1000px;
+}
+
+/* Luces de fondo ambientales */
+body::before, body::after {
+    content: "";
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    opacity: 0.4;
+}
+body::before { background: #ff0000; top: -10%; left: -10%; } /* Brillo Rojo */
+body::after { background: #00d4ff; bottom: -10%; right: -10%; } /* Brillo Azul */
+
+.card-wrapper {
+    position: relative;
+    width: 380px;
+    padding: 45px;
+    background: rgba(10, 10, 10, 0.9);
+    border-radius: 20px;
+    color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,1);
+    z-index: 1;
+    overflow: hidden; /* Para que el brillo no se salga */
+}
+
+/* Luces de fondo dinámicas */
+.cursor-glow-red, .cursor-glow-blue {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.6;
+    pointer-events: none;
+    transition: transform 0.1s ease-out;
+}
+
+.cursor-glow-red {
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, transparent 70%);
+}
+
+.cursor-glow-blue {
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+}
+
+
+/* EL BORDE ANIMADO (Creativo) */
+.card-wrapper::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(
+        transparent, 
+        #00d4ff, 
+        transparent, 
+        #ff0000, 
+        transparent
+    );
+    animation: rotateBorder 15s linear infinite;
+    z-index: -2;
+}
+
+/* Capa interior para tapar el centro del degradado y dejar solo el borde */
+.card-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 3px; /* Grosor del borde */
+    background: #0a0a0a;
+    border-radius: 18px;
+    z-index: -1;
+}
+
+@keyframes rotateBorder {
+    100% { transform: rotate(360deg); }
+}
+
+.card-header h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    background: linear-gradient(90deg, #00d4ff, #ff0000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.rarity {
+    display: block;
+    text-align: center;
+    color: #ff0000;
+    text-shadow: 0 0 5px #ff0000;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 5px;
+    margin-bottom: 30px;
+}
+
+/* Inputs con estilo "Dark Energy" */
+.input-group {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group label {
+    position: absolute;
+    left: 12px; top: 12px;
+    color: #666;
+    transition: 0.3s;
+    pointer-events: none;
+}
+
+.input-group input:focus, .input-group input:valid {
+    border-color: #00d4ff;
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.input-group input:focus ~ label, .input-group input:valid ~ label {
+    top: -22px;
+    left: 5px;
+    font-size: 0.75rem;
+    color: #00d4ff;
+}
+
+/* Botón de "Acceso Concedido" */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background: transparent;
+    border: 2px solid #ff0000;
+    color: #ff0000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.4s;
+    text-transform: uppercase;
+}
+
+.btn-login:hover {
+    background: #ff0000;
+    color: #000;
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+
+.footer-text a {
+    color: #00d4ff;
+    text-decoration: none;
+    font-weight: bold;
+}

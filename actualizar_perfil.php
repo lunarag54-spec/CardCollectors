@@ -1,16 +1,26 @@
 <?php
 session_start();
 require_once 'includes/conexion.php';
+require_once 'includes/funciones.php';
 
 // Verificación de sesión (Seguimos con ID 1 temporalmente por desarrollo)
 if (!isset($_SESSION['id_usuario'])) {
-    $_SESSION['id_usuario'] = 1;
+    header("Location: login.php");
+    exit();
 }
 
 $id_usuario = $_SESSION['id_usuario'];
 
 // Solo procesamos si los datos vienen por POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    //Primero capturamos el dato que viene del formulario
+    $password_confirm = $_POST['password_confirmacion'];
+
+    // VALIDACIÓN DE SEGURIDAD
+    if (!verificarPasswordActual($conn, $id_usuario, $password_confirm)) {
+        header("Location: editar_perfil.php?error=pass_incorrecta");
+        exit();
+    }
     
     // 1. Saneamiento de datos para evitar Inyección SQL
     $nombre = mysqli_real_escape_string($conn, $_POST['nombre']);

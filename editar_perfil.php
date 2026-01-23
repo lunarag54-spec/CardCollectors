@@ -3,7 +3,8 @@ session_start();
 require_once 'includes/conexion.php';
 
 if (!isset($_SESSION['id_usuario'])) {
-    $_SESSION['id_usuario'] = 1;
+    header("Location: login.php");
+    exit();
 }
 
 $id_usuario = $_SESSION['id_usuario'];
@@ -41,6 +42,13 @@ include 'includes/cabecera.php';
                 <label class="form-label">Cambiar Contraseña</label>
                 <input type="password" name="nueva_password" class="form-input" placeholder="Dejar en blanco para no cambiar">
                 <small>Solo completa este campo si deseas una nueva clave.</small>
+            </div>
+
+            <div class="seccion-seguridad">
+                <label class="form-label">Confirmar con Contraseña Actual</label>
+                <input type="password" name="password_confirmacion" class="form-input" required 
+                       placeholder="Ingresa tu clave actual para autorizar los cambios">
+                <small class="texto-importante">Requerido para cualquier modificación.</small>
             </div>
 
             <div class="btn-container">

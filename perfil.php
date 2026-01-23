@@ -1,11 +1,12 @@
 <?php
-session_start();
+session_start(); 
 require_once 'includes/conexion.php';
 
 // Verificación de sesión activa. 
 // Mientras se implementa el Login, usamos el ID 1 (Administrador) del SQL.
 if (!isset($_SESSION['id_usuario'])) {
-    $_SESSION['id_usuario'] = 1; 
+   header("Location: login.php");
+    exit(); 
 }
 
 $id_usuario = $_SESSION['id_usuario'];

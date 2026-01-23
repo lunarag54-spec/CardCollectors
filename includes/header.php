@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once 'includes/conexion.php';
 
-// Lógica del contador del carrito
+// Lógica Real del contador del carrito (Rama Main)
 $items_en_carrito = 0;
 if (isset($_SESSION['id_usuario'])) {
     $uid = $_SESSION['id_usuario'];
@@ -25,6 +25,7 @@ if (isset($_SESSION['id_usuario'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Collector | Tienda de Reliquias</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
@@ -36,48 +37,58 @@ if (isset($_SESSION['id_usuario'])) {
             --text-color: #ffffff;
         }
 
+        * { box-sizing: border-box; }
+
         body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
             margin: 0;
             font-family: 'Rajdhani', sans-serif;
             background-color: #000;
             color: var(--text-color);
         }
 
-        /* ===== HEADER CON BORDE ANIMADO FLUIDO ===== */
+        /* ===== HEADER CON BORDE ANIMADO CYBERPUNK ===== */
         .main-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--text-color);
             padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            /* El borde real se simula con el pseudo-elemento */
-        }
-
-        /* Contenedor del borde animado */
-        .header-border-container {
             position: sticky;
             top: 0;
             z-index: 100;
-            padding-bottom: 3px; /* Grosor del borde inferior */
-            background: linear-gradient(90deg, 
-                transparent, 
-                var(--accent-blue), 
-                var(--accent-red), 
-                var(--accent-blue), 
-                transparent);
-            background-size: 200% 100%;
-            animation: moveGradient 6s linear infinite;
+            overflow: hidden; /* Importante para el efecto de luz */
         }
 
-        @keyframes moveGradient {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        /* El efecto de luz rotatoria */
+        .main-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--accent-blue), transparent, var(--accent-red), transparent);
+            animation: rotateBorder 12s linear infinite;
+            z-index: -1;
         }
 
-        /* Estilos de navegación */
+        .main-header::after {
+            content: "";
+            position: absolute;
+            inset: 2px; /* Grosor del borde */
+            background-color: var(--primary-color);
+            z-index: -1;
+        }
+
+        @keyframes rotateBorder {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Navegación */
         .nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
 
         .btn-home {
@@ -90,6 +101,7 @@ if (isset($_SESSION['id_usuario'])) {
             gap: 8px;
             transition: 0.3s;
         }
+
         .btn-home:hover { color: var(--accent-blue); text-shadow: 0 0 10px var(--accent-blue); }
 
         .user-info {
@@ -106,7 +118,9 @@ if (isset($_SESSION['id_usuario'])) {
             font-size: 0.7rem;
             margin-left: 10px;
             font-weight: bold;
+            transition: 0.3s;
         }
+        .btn-logout:hover { text-shadow: 0 0 8px var(--accent-red); }
 
         .btn-subir-reliquia {
             border: 1px solid var(--accent-blue);
@@ -117,8 +131,11 @@ if (isset($_SESSION['id_usuario'])) {
             font-size: 0.75rem;
             border-radius: 5px;
             transition: 0.3s;
-            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
         .btn-subir-reliquia:hover {
             background: var(--accent-blue);
             color: #000;
@@ -130,13 +147,15 @@ if (isset($_SESSION['id_usuario'])) {
             font-size: 1.2rem;
             position: relative;
             text-decoration: none;
+            transition: 0.3s;
         }
+        .nav-icon:hover { color: var(--accent-blue); }
 
-        /* BADGE DEL CARRITO ESTILO NEÓN */
+        /* Badge del Carrito Estilo Neón */
         .cart-count {
             background: var(--accent-red);
             color: #fff;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             min-width: 18px;
             height: 18px;
             display: flex;
@@ -146,15 +165,15 @@ if (isset($_SESSION['id_usuario'])) {
             position: absolute;
             top: -10px;
             right: -12px;
-            font-family: 'Orbitron', sans-serif;
             box-shadow: 0 0 10px var(--accent-red);
-            border: 1px solid #fff;
+            font-family: 'Orbitron', sans-serif;
         }
+
+        main { flex: 1; }
     </style>
 </head>
 <body>
 
-<div class="header-border-container">
     <header class="main-header">
         <div class="nav-left">
             <a href="index.php" class="btn-home">
@@ -170,13 +189,15 @@ if (isset($_SESSION['id_usuario'])) {
         </div>
 
         <nav class="nav-right">
-            <a href="subir_producto.php" class="btn-subir-reliquia">
-                <i class="fas fa-plus-circle"></i> SUBIR RELIQUIA
+            <a href="admin_productos.php" class="btn-subir-reliquia">
+                <i class="fas fa-plus-circle"></i> GESTIONAR INVENTARIO
             </a>
 
-            <a href="perfil.php" class="nav-icon"><i class="fas fa-user-shield"></i></a>
+            <a href="perfil.php" class="nav-icon" title="Mi Perfil">
+                <i class="fas fa-user-shield"></i>
+            </a>
 
-            <a href="carrito.php" class="nav-icon">
+            <a href="carrito.php" class="nav-icon" title="Ver Carrito">
                 <i class="fas fa-shopping-cart"></i>
                 <?php if ($items_en_carrito > 0): ?>
                     <span class="cart-count"><?php echo $items_en_carrito; ?></span>
@@ -184,6 +205,5 @@ if (isset($_SESSION['id_usuario'])) {
             </a>
         </nav>
     </header>
-</div>
 
-<main>
+    <main>

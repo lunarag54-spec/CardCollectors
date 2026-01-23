@@ -4,9 +4,11 @@ if (!isset($_SESSION['id_usuario'])) {
     header("Location: login.php");
     exit();
 }
+
 require_once 'includes/conexion.php';
 include 'includes/header.php';
 
+// Consulta para obtener productos activos con stock
 $sql = "SELECT p.*, c.nombre_categoria 
         FROM Producto p 
         INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
@@ -18,6 +20,7 @@ $resultado = $conn->query($sql);
 
 <style>
     body {
+        /* Fondo Cyberpunk: Degradado radial + Malla técnica */
         background:
             radial-gradient(circle at center, rgba(13, 17, 23, 0.8) 0%, #050505 100%),
             linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
@@ -29,6 +32,7 @@ $resultado = $conn->query($sql);
         margin: 0;
     }
 
+    /* Luz de neón difusa en el techo de la página */
     body::before {
         content: "";
         position: fixed;
@@ -51,14 +55,6 @@ $resultado = $conn->query($sql);
         z-index: 10;
     }
 
-    .main-footer {
-        flex-shrink: 0 !important;
-        position: relative !important;
-        z-index: 20;
-        background: #000 !important;
-        border-top: 1px solid #333;
-    }
-
     .titulo-catalogo {
         font-family: 'Orbitron', sans-serif;
         color: #fff;
@@ -66,7 +62,7 @@ $resultado = $conn->query($sql);
         text-transform: uppercase;
         letter-spacing: 5px;
         margin-bottom: 50px;
-        text-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
     }
 
     .grid-productos {
@@ -75,6 +71,7 @@ $resultado = $conn->query($sql);
         gap: 40px;
     }
 
+    /* Tarjetas con borde de neón rotatorio */
     .producto-card-wrapper {
         position: relative;
         padding: 2px;
@@ -126,28 +123,31 @@ $resultado = $conn->query($sql);
         padding: 20px;
         flex-grow: 1;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .nombre-producto {
         font-family: 'Rajdhani', sans-serif;
         color: #00d4ff;
         font-size: 1.5rem;
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         text-transform: uppercase;
         font-weight: bold;
     }
+
+    .cat-txt { color: #666; font-size: 0.8rem; margin-bottom: 10px; display: block; }
 
     .precio-txt {
         color: #fff;
         font-family: 'Orbitron', sans-serif;
         font-size: 1.4rem;
-        display: block;
-        margin: 10px 0;
+        margin-bottom: 15px;
     }
 
-    /* Estilo botón transformado a Link */
     .btn-reclamar {
-        display: block; /* Importante para que se comporte como bloque */
+        display: block;
         width: 100%;
         background: transparent;
         border: 2px solid #ff0000;
@@ -157,8 +157,7 @@ $resultado = $conn->query($sql);
         font-weight: bold;
         cursor: pointer;
         transition: 0.3s;
-        margin-top: 10px;
-        text-decoration: none; /* Quitar subrayado de enlace */
+        text-decoration: none;
         text-align: center;
     }
 
@@ -171,10 +170,10 @@ $resultado = $conn->query($sql);
 
 <main>
     <h1 class="titulo-catalogo">Inventario de Reliquias</h1>
+    
     <div class="grid-productos">
         <?php if ($resultado && $resultado->num_rows > 0): ?>
             <?php while ($row = $resultado->fetch_assoc()): 
-                // CORRECCIÓN DE LA LÍNEA DEL ERROR
                 $nombreImagen = !empty($row['imagen']) ? $row['imagen'] : 'default.jpg';
                 $rutaImagen = "img/productos/" . $nombreImagen;
             ?>
@@ -184,8 +183,12 @@ $resultado = $conn->query($sql);
                             <img src="<?php echo $rutaImagen; ?>" alt="<?php echo htmlspecialchars($row['nombre']); ?>">
                         </div>
                         <div class="info-container">
-                            <h3 class="nombre-producto"><?php echo htmlspecialchars($row['nombre']); ?></h3>
-                            <span class="precio-txt"><?php echo number_format($row['precio'], 2); ?>€</span>
+                            <div>
+                                <h3 class="nombre-producto"><?php echo htmlspecialchars($row['nombre']); ?></h3>
+                                <span class="cat-txt"><?php echo htmlspecialchars($row['nombre_categoria']); ?></span>
+                            </div>
+                            
+                            <div class="precio-txt"><?php echo number_format($row['precio'], 2); ?>€</div>
                             
                             <a href="agregar_al_carrito.php?id=<?php echo $row['id_producto']; ?>" class="btn-reclamar">
                                 AÑADIR AL CARRITO
@@ -194,7 +197,13 @@ $resultado = $conn->query($sql);
                     </div>
                 </article>
             <?php endwhile; ?>
+        <?php else: ?>
+            <p style="color: #888; text-align: center; grid-column: 1/-1; padding: 50px;">
+                <i class="fas fa-ghost" style="font-size: 3rem; display: block; margin-bottom: 15px;"></i>
+                No hay artículos disponibles en el mazo actualmente.
+            </p>
         <?php endif; ?>
     </div>
 </main>
+
 <?php include 'includes/pie.php'; ?>

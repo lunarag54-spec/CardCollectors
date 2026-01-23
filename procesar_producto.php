@@ -1,6 +1,7 @@
 <?php
 session_start();
-// 1. Verificación de seguridad: solo usuarios logueados
+
+// 1. CONTROL DE ACCESO: Solo usuarios logueados
 if (!isset($_SESSION['id_usuario'])) {
     header("Location: login.php");
     exit();
@@ -9,63 +10,83 @@ if (!isset($_SESSION['id_usuario'])) {
 require_once 'includes/conexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_usuario = $_SESSION['id_usuario'];
-    $nombre = $_POST['nombre'];
-    $desc = $_POST['descripcion'];
+    
+    // Seguridad de Identidad: el vendedor siempre es el usuario logueado
+    $id_vendedor = $_SESSION['id_usuario']; 
+    
+    // Limpieza de datos recibidos
+    $nombre = trim($_POST['nombre']);
+    $desc = trim($_POST['descripcion']);
     $cat = intval($_POST['id_categoria']);
     $precio = floatval($_POST['precio']);
     $stock = intval($_POST['stock']);
 
-    // --- LÓGICA DE PROCESAMIENTO DE IMAGEN ---
-    $nombre_archivo_final = "default.jpg"; // Valor por defecto
+    // Validaciones de negocio
+    if (empty($nombre) || $precio <= 0) {
+        header("Location: admin_productos.php?msg=err_nombre");
+        exit();
+    }
+
+    // --- LÓGICA DE PROCESAMIENTO DE IMAGEN (SEGURIDAD AVANZADA) ---
+    $nombre_archivo_final = "default.jpg"; 
 
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
         $directorio_subida = "img/productos/";
         
-        // Crear carpeta si no existe
         if (!file_exists($directorio_subida)) {
             mkdir($directorio_subida, 0777, true);
         }
 
-        // Obtener extensión y limpiar el nombre para el archivo
+        $tmp_name = $_FILES['foto']['tmp_name'];
         $info_archivo = pathinfo($_FILES['foto']['name']);
         $extension = strtolower($info_archivo['extension']);
-        
-        // Solo permitimos extensiones seguras
         $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'webp'];
         
+        // A. Validar extensión permitida
         if (in_array($extension, $extensiones_permitidas)) {
-            // Renombrado: prod_u{ID}_nombreLimpio_{TIMESTAMP}.ext
-            $nombre_producto_limpio = substr(preg_replace("/[^a-zA-Z0-9]/", "", $nombre), 0, 15);
-            $nombre_archivo_final = "prod_u" . $id_usuario . "_" . $nombre_producto_limpio . "_" . time() . "." . $extension;
             
-            $ruta_completa = $directorio_subida . $nombre_archivo_final;
+            // B. VALIDACIÓN ANTIVIRUS/MALWARE: ¿Es realmente una imagen?
+            // getimagesize() analiza los bytes del archivo, no solo el nombre.
+            $check = getimagesize($tmp_name);
+            if ($check !== false) {
+                
+                // C. RENOMBRADO SEGURO
+                // Evitamos caracteres especiales y ataques de Directory Traversal
+                $nombre_limpio = substr(preg_replace("/[^a-zA-Z0-9]/", "", $nombre), 0, 15);
+                $nombre_archivo_final = "prod_u" . $id_vendedor . "_" . $nombre_limpio . "_" . time() . "." . $extension;
+                
+                $ruta_destino = $directorio_subida . $nombre_archivo_final;
 
-            if (!move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_completa)) {
-                // Si falla la subida física, volvemos al default
-                $nombre_archivo_final = "default.jpg";
+                if (!move_uploaded_file($tmp_name, $ruta_destino)) {
+                    $nombre_archivo_final = "default.jpg"; 
+                }
+            } else {
+                // El archivo finge ser imagen pero es potencialmente peligroso
+                header("Location: admin_productos.php?msg=err_img_fake");
+                exit();
             }
         }
     }
 
-    // --- INSERCIÓN SEGURA EN LA BASE DE DATOS ---
-    // Usamos sentencias preparadas para evitar inyección SQL
+    // --- 2. INSERCIÓN ATÓMICA (SENTENCIAS PREPARADAS) ---
     $sql = "INSERT INTO Producto (nombre, descripcion, imagen, id_categoria, precio, stock, estado, id_vendedor) 
             VALUES (?, ?, ?, ?, ?, ?, 'activo', ?)";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssidii", $nombre, $desc, $nombre_archivo_final, $cat, $precio, $stock, $id_usuario);
+    
+    // Tipos de datos: s (string), i (int), d (double/float)
+    $stmt->bind_param("sssidii", $nombre, $desc, $nombre_archivo_final, $cat, $precio, $stock, $id_vendedor);
 
     if ($stmt->execute()) {
-        // Éxito: volvemos al panel de admin o al index
         header("Location: admin_productos.php?msg=ok");
         exit();
     } else {
-        // Error de base de datos
-        die("Error al guardar el producto: " . $conn->error);
+        // Log de error interno y mensaje amigable
+        error_log("Error en DB: " . $conn->error);
+        die("Error crítico en la forja de la reliquia. Inténtelo más tarde.");
     }
+
 } else {
-    // Si alguien intenta entrar directamente al PHP sin POST
-    header("Location: subir_producto.php");
+    header("Location: admin_productos.php");
     exit();
 }

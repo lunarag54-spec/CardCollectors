@@ -1,11 +1,15 @@
 <?php
 session_start();
-if (!isset($_SESSION['id_usuario'])) { header("Location: login.php"); exit(); }
+if (!isset($_SESSION['id_usuario'])) { 
+    header("Location: login.php"); 
+    exit(); 
+}
 require_once 'includes/conexion.php';
+include 'includes/header.php'; // Asegúrate de incluir el header para mantener el estilo
 
 $id_usuario = $_SESSION['id_usuario'];
 
-// Consulta uniendo las tablas para sacar los productos actuales del mazo
+// Consulta para sacar los productos actuales del mazo
 $sql = "SELECT p.id_producto, p.nombre, p.precio, cp.cantidad 
         FROM Producto p 
         INNER JOIN Carrito_Producto cp ON p.id_producto = cp.id_producto 
@@ -23,6 +27,20 @@ $total_compra = 0;
     <title>Mi Carrito | Card Collector</title>
     <link rel="stylesheet" href="css/carrito.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilo extra para el estado vacío si no está en tu CSS */
+        .mazo-vacio-contenedor {
+            text-align: center;
+            padding: 60px 20px;
+            color: #fff;
+        }
+        .mazo-vacio-contenedor p {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
 
@@ -72,14 +90,18 @@ $total_compra = 0;
                 </div>
 
             <?php else: ?>
-                <div style="text-align: center; padding: 40px;">
-                    <p style="font-size: 1.2rem; margin-bottom: 20px;">No hay cartas en tu mazo todavía.</p>
-                    <a href="index.php" class="btn btn-comprar">IR A LA TIENDA</a>
+                <div class="mazo-vacio-contenedor">
+                    <i class="fas fa-ghost" style="font-size: 4rem; color: var(--accent-blue); margin-bottom: 20px; display: block;"></i>
+                    <p>No hay reliquias en tu mazo todavía.</p>
+                    <div class="acciones" style="justify-content: center;">
+                        <a href="index.php" class="btn btn-comprar">IR A LA TIENDA</a>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 
+    <?php include 'includes/pie.php'; ?>
     <script src="js/index.js"></script>
 </body>
 </html>

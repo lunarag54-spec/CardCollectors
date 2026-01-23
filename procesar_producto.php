@@ -11,29 +11,28 @@ require_once 'includes/conexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // Capturamos el ID del vendedor directamente de la sesión (Seguridad de Identidad)
+    // Seguridad de Identidad: el vendedor siempre es el usuario logueado
     $id_vendedor = $_SESSION['id_usuario']; 
     
-    // Limpieza de datos básicos
+    // Limpieza de datos recibidos
     $nombre = trim($_POST['nombre']);
     $desc = trim($_POST['descripcion']);
     $cat = intval($_POST['id_categoria']);
     $precio = floatval($_POST['precio']);
     $stock = intval($_POST['stock']);
 
-    // Validaciones básicas de negocio
+    // Validaciones de negocio
     if (empty($nombre) || $precio <= 0) {
         header("Location: admin_productos.php?msg=err_nombre");
         exit();
     }
 
-    // --- SEGURIDAD DE IMAGEN (ANTIMALWARE) ---
+    // --- LÓGICA DE PROCESAMIENTO DE IMAGEN (SEGURIDAD AVANZADA) ---
     $nombre_archivo_final = "default.jpg"; 
 
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 0) {
         $directorio_subida = "img/productos/";
         
-        // Creamos la carpeta si no existe
         if (!file_exists($directorio_subida)) {
             mkdir($directorio_subida, 0777, true);
         }
@@ -43,55 +42,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $extension = strtolower($info_archivo['extension']);
         $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'webp'];
         
-        // A. Validar extensión
+        // A. Validar extensión permitida
         if (in_array($extension, $extensiones_permitidas)) {
             
-            // B. VALIDACIÓN REAL DE CONTENIDO: ¿Es realmente una imagen?
-            // getimagesize() devuelve falso si el archivo no es una imagen real (aunque tenga extensión .jpg)
+            // B. VALIDACIÓN ANTIVIRUS/MALWARE: ¿Es realmente una imagen?
+            // getimagesize() analiza los bytes del archivo, no solo el nombre.
             $check = getimagesize($tmp_name);
             if ($check !== false) {
                 
                 // C. RENOMBRADO SEGURO
-                // Limpiamos el nombre para evitar caracteres extraños y añadimos timestamp
+                // Evitamos caracteres especiales y ataques de Directory Traversal
                 $nombre_limpio = substr(preg_replace("/[^a-zA-Z0-9]/", "", $nombre), 0, 15);
                 $nombre_archivo_final = "prod_u" . $id_vendedor . "_" . $nombre_limpio . "_" . time() . "." . $extension;
                 
                 $ruta_destino = $directorio_subida . $nombre_archivo_final;
 
                 if (!move_uploaded_file($tmp_name, $ruta_destino)) {
-                    $nombre_archivo_final = "default.jpg"; // Si falla la subida, ponemos la de por defecto
+                    $nombre_archivo_final = "default.jpg"; 
                 }
             } else {
-                // El archivo parece una imagen por la extensión, pero contiene código malicioso
+                // El archivo finge ser imagen pero es potencialmente peligroso
                 header("Location: admin_productos.php?msg=err_img_fake");
                 exit();
             }
         }
     }
 
-    /**
-     * 2. INSERCIÓN SEGURA (SENTENCIAS PREPARADAS)
-     * Insertamos el id_vendedor capturado de la sesión.
-     */
+    // --- 2. INSERCIÓN ATÓMICA (SENTENCIAS PREPARADAS) ---
     $sql = "INSERT INTO Producto (nombre, descripcion, imagen, id_categoria, precio, stock, estado, id_vendedor) 
             VALUES (?, ?, ?, ?, ?, ?, 'activo', ?)";
     
     $stmt = $conn->prepare($sql);
     
-    // Tipos: s=string, i=int, d=double
-    // bind_param: nombre(s), desc(s), imagen(s), cat(i), precio(d), stock(i), vendedor(i)
+    // Tipos de datos: s (string), i (int), d (double/float)
     $stmt->bind_param("sssidii", $nombre, $desc, $nombre_archivo_final, $cat, $precio, $stock, $id_vendedor);
 
     if ($stmt->execute()) {
         header("Location: admin_productos.php?msg=ok");
         exit();
     } else {
-        // En producción, mejor registrar el error en un log y mostrar mensaje genérico
-        die("Error crítico en la forja de la reliquia: " . $conn->error);
+        // Log de error interno y mensaje amigable
+        error_log("Error en DB: " . $conn->error);
+        die("Error crítico en la forja de la reliquia. Inténtelo más tarde.");
     }
 
 } else {
-    // Si intentan entrar al archivo por URL sin POST, los echamos
-    header("Location: subir_producto.php");
+    header("Location: admin_productos.php");
     exit();
 }

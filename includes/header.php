@@ -1,19 +1,33 @@
 <?php
-// Contador de carrito (puedes conectarlo a tu base de datos después)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once 'includes/conexion.php';
+
+// Lógica Real del contador del carrito (Rama Main)
 $items_en_carrito = 0;
+if (isset($_SESSION['id_usuario'])) {
+    $uid = $_SESSION['id_usuario'];
+    $sql_count = "SELECT SUM(cp.cantidad) as total 
+                  FROM Carrito_Producto cp 
+                  INNER JOIN Carrito c ON cp.id_carrito = c.id_carrito 
+                  WHERE c.id_usuario = $uid";
+    $res_count = $conn->query($sql_count);
+    if ($res_count) {
+        $row_count = $res_count->fetch_assoc();
+        $items_en_carrito = $row_count['total'] ?? 0;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Collector | Tienda de Reliquias</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,9 +37,7 @@ $items_en_carrito = 0;
             --text-color: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             display: flex;
@@ -34,9 +46,10 @@ $items_en_carrito = 0;
             margin: 0;
             font-family: 'Rajdhani', sans-serif;
             background-color: #000;
+            color: var(--text-color);
         }
 
-        /* ===== HEADER ANIMADO ===== */
+        /* ===== HEADER CON BORDE ANIMADO CYBERPUNK ===== */
         .main-header {
             background-color: var(--primary-color);
             color: var(--text-color);
@@ -44,19 +57,14 @@ $items_en_carrito = 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             position: sticky;
             top: 0;
             z-index: 100;
+            overflow: hidden; /* Importante para el efecto de luz */
         }
 
-        /* Borde animado del Header */
-        .header-border {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header-border::before {
+        /* El efecto de luz rotatoria */
+        .main-header::before {
             content: "";
             position: absolute;
             top: -50%;
@@ -64,46 +72,37 @@ $items_en_carrito = 0;
             width: 200%;
             height: 200%;
             background: conic-gradient(transparent, var(--accent-blue), transparent, var(--accent-red), transparent);
-            animation: rotateBorder 10s linear infinite;
+            animation: rotateBorder 12s linear infinite;
             z-index: -1;
         }
 
-        .header-border::after {
+        .main-header::after {
             content: "";
             position: absolute;
-            inset: 2px;
+            inset: 2px; /* Grosor del borde */
             background-color: var(--primary-color);
             z-index: -1;
         }
 
         @keyframes rotateBorder {
-            100% {
-                transform: rotate(360deg);
-            }
+            100% { transform: rotate(360deg); }
         }
 
-        /* Secciones del Nav */
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        /* Navegación */
+        .nav-left, .nav-right { display: flex; align-items: center; gap: 20px; }
 
         .btn-home {
             color: var(--text-color);
             text-decoration: none;
             font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            font-size: 1.1rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: color 0.3s;
+            transition: 0.3s;
         }
 
-        .btn-home:hover {
-            color: var(--accent-blue);
-        }
+        .btn-home:hover { color: var(--accent-blue); text-shadow: 0 0 10px var(--accent-blue); }
 
         .user-info {
             font-size: 0.85rem;
@@ -112,104 +111,70 @@ $items_en_carrito = 0;
             color: #ccc;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 25px;
+        .btn-logout {
+            color: var(--accent-red);
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            margin-left: 10px;
+            font-weight: bold;
+            transition: 0.3s;
         }
+        .btn-logout:hover { text-shadow: 0 0 8px var(--accent-red); }
 
-        /* BOTÓN SUBIR PRODUCTO */
         .btn-subir-reliquia {
-            background: transparent;
             border: 1px solid var(--accent-blue);
             color: var(--accent-blue);
             padding: 8px 16px;
+            text-decoration: none;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.75rem;
-            font-weight: bold;
-            text-decoration: none;
             border-radius: 5px;
-            transition: all 0.3s ease;
+            transition: 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
-            letter-spacing: 1px;
         }
 
         .btn-subir-reliquia:hover {
             background: var(--accent-blue);
             color: #000;
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
-            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--accent-blue);
         }
 
-        /* Iconos */
         .nav-icon {
-            color: var(--text-color);
+            color: #fff;
             font-size: 1.2rem;
             position: relative;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: 0.3s;
         }
+        .nav-icon:hover { color: var(--accent-blue); }
 
-        .nav-icon:hover {
-            color: var(--accent-blue);
-            text-shadow: 0 0 10px var(--accent-blue);
-        }
-
+        /* Badge del Carrito Estilo Neón */
         .cart-count {
-            background-color: var(--accent-red);
+            background: var(--accent-red);
             color: #fff;
             font-size: 0.65rem;
-            padding: 2px 5px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
             position: absolute;
-            top: -8px;
-            right: -10px;
-            box-shadow: 0 0 5px var(--accent-red);
-        }
-
-        .btn-logout {
-            color: var(--accent-red);
-            text-decoration: none;
-            font-weight: bold;
+            top: -10px;
+            right: -12px;
+            box-shadow: 0 0 10px var(--accent-red);
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            margin-left: 10px;
-            transition: text-shadow 0.3s;
         }
 
-        .btn-logout:hover {
-            text-shadow: 0 0 8px var(--accent-red);
-        }
-
-        main {
-            flex: 1;
-        }
-
-        /* Modifica esta parte en el <style> de tu header.php */
-        .header-border::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent,
-                    var(--accent-blue),
-                    transparent,
-                    var(--accent-red),
-                    transparent);
-            /* Animación ralentizada a 20 segundos */
-            animation: rotateBorder 20s linear infinite;
-            z-index: -1;
-        }
+        main { flex: 1; }
     </style>
 </head>
-
 <body>
 
-    <header class="main-header header-border">
+    <header class="main-header">
         <div class="nav-left">
             <a href="index.php" class="btn-home">
                 <i class="fas fa-bullseye"></i> INICIO
@@ -217,15 +182,15 @@ $items_en_carrito = 0;
 
             <?php if (isset($_SESSION['nombre'])): ?>
                 <div class="user-info">
-                    <span>Mazo de: <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong></span>
+                    Mazo de: <strong><?php echo htmlspecialchars($_SESSION['nombre']); ?></strong>
                     <a href="logout.php" class="btn-logout">ABANDONAR SESIÓN</a>
                 </div>
             <?php endif; ?>
         </div>
 
         <nav class="nav-right">
-            <a href="subir_producto.php" class="btn-subir-reliquia">
-                <i class="fas fa-plus-circle"></i> SUBIR RELIQUIA
+            <a href="admin_productos.php" class="btn-subir-reliquia">
+                <i class="fas fa-plus-circle"></i> GESTIONAR INVENTARIO
             </a>
 
             <a href="perfil.php" class="nav-icon" title="Mi Perfil">
@@ -235,7 +200,7 @@ $items_en_carrito = 0;
             <a href="carrito.php" class="nav-icon" title="Ver Carrito">
                 <i class="fas fa-shopping-cart"></i>
                 <?php if ($items_en_carrito > 0): ?>
-                    <span class="cart-count"><?= $items_en_carrito ?></span>
+                    <span class="cart-count"><?php echo $items_en_carrito; ?></span>
                 <?php endif; ?>
             </a>
         </nav>

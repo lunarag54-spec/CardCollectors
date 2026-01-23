@@ -2,7 +2,7 @@
 session_start();
 require_once 'includes/conexion.php';
 
-// 1. SEGURIDAD: Verificar sesión y pertenencia del producto
+// 1. SEGURIDAD: Verificar sesión y existencia de ID
 if (!isset($_SESSION['id_usuario']) || !isset($_GET['id'])) {
     header("Location: login.php");
     exit();
@@ -11,7 +11,7 @@ if (!isset($_SESSION['id_usuario']) || !isset($_GET['id'])) {
 $id_prod = intval($_GET['id']);
 $id_user = $_SESSION['id_usuario'];
 
-// Buscamos el producto pero ASEGURANDO que el id_vendedor sea el del usuario actual
+// Buscamos el producto ASEGURANDO que pertenezca al vendedor logueado
 $sql = "SELECT * FROM Producto WHERE id_producto = ? AND id_vendedor = ? AND estado = 'activo'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ii", $id_prod, $id_user);
@@ -19,24 +19,24 @@ $stmt->execute();
 $resultado = $stmt->get_result();
 
 if ($resultado->num_rows === 0) {
-    // Si el ID no existe o no le pertenece al usuario, lo expulsamos
+    // Si el ID no existe o no le pertenece, error de permisos
     header("Location: admin_productos.php?msg=err_permiso");
     exit();
 }
 
 $producto = $resultado->fetch_assoc();
 
-// Consulta para las categorías
+// Consulta para las categorías (para el desplegable)
 $query_cat = "SELECT * FROM Categoria";
 $res_cat = $conn->query($query_cat);
 
-include 'includes/header.php';
+include 'includes/header.php'; // Asegúrate de que este es el nombre de tu header
 ?>
 
 <style>
-    /* Mantenemos la coherencia con el fondo vistoso */
     body {
         background: radial-gradient(circle at center, #0d1117 0%, #050505 100%) !important;
+        color: #fff;
     }
 
     .edit-container {
@@ -64,10 +64,10 @@ include 'includes/header.php';
         opacity: 0.5;
     }
 
-    h2 { font-family: 'Orbitron'; color: #00d4ff; text-align: center; margin-bottom: 30px; }
+    h2 { font-family: 'Orbitron', sans-serif; color: #00d4ff; text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
 
     .form-group { margin-bottom: 20px; }
-    .form-group label { color: #888; font-family: 'Orbitron'; font-size: 0.8rem; display: block; margin-bottom: 8px; }
+    .form-group label { color: #888; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; display: block; margin-bottom: 8px; }
     
     .form-control {
         width: 100%;
@@ -76,6 +76,7 @@ include 'includes/header.php';
         border: 1px solid #333;
         color: #fff;
         border-radius: 8px;
+        box-sizing: border-box;
     }
 
     .img-preview {
@@ -92,12 +93,13 @@ include 'includes/header.php';
         color: #000;
         border: none;
         padding: 15px 30px;
-        font-family: 'Orbitron';
+        font-family: 'Orbitron', sans-serif;
         font-weight: bold;
         cursor: pointer;
         border-radius: 8px;
         width: 100%;
         transition: 0.3s;
+        margin-top: 10px;
     }
 
     .btn-update:hover {
@@ -108,13 +110,13 @@ include 'includes/header.php';
 
 <div class="edit-container">
     <div class="card-editar">
-        <h2>EDITAR RELIQUIA</h2>
+        <h2>MODIFICAR RELIQUIA</h2>
         
         <form action="procesar_edicion.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id_producto" value="<?= $producto['id_producto'] ?>">
 
             <div class="form-group">
-                <label>Nombre del Objeto</label>
+                <label>Nombre de la Reliquia</label>
                 <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($producto['nombre']) ?>" required>
             </div>
 
@@ -130,9 +132,9 @@ include 'includes/header.php';
             </div>
 
             <div class="form-group">
-                <label>Imagen Actual</label><br>
+                <label>Imagen del Archivo</label><br>
                 <img src="img/productos/<?= $producto['imagen'] ?>" class="img-preview" onerror="this.src='img/productos/default.jpg'"><br>
-                <label>Cambiar imagen (Opcional)</label>
+                <label style="font-size: 0.7rem;">Subir nuevo archivo (opcional)</label>
                 <input type="file" name="foto" class="form-control" accept="image/*">
             </div>
 
@@ -142,13 +144,13 @@ include 'includes/header.php';
                     <input type="number" name="precio" step="0.01" class="form-control" value="<?= $producto['precio'] ?>" required>
                 </div>
                 <div class="form-group" style="flex:1;">
-                    <label>Stock</label>
+                    <label>Stock Disponible</label>
                     <input type="number" name="stock" class="form-control" value="<?= $producto['stock'] ?>" required>
                 </div>
             </div>
 
-            <button type="submit" class="btn-update">ACTUALIZAR NÚCLEO</button>
-            <a href="admin_productos.php" style="display:block; text-align:center; color:#666; margin-top:15px; text-decoration:none; font-family:'Orbitron'; font-size:0.7rem;">CANCELAR</a>
+            <button type="submit" class="btn-update">RECONFIGURAR DATOS</button>
+            <a href="admin_productos.php" style="display:block; text-align:center; color:#666; margin-top:20px; text-decoration:none; font-family:'Orbitron'; font-size:0.7rem;">ABORTAR OPERACIÓN</a>
         </form>
     </div>
 </div>

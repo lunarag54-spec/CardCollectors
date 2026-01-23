@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+:root {
+    --primary-bg-container: #383838;
+    --neon-blue: #00d4ff;
+    --neon-red: #ff4444;
+    --text-white: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    margin: 0;
+    font-family: 'Rajdhani', sans-serif;
+    background-color: #000;
+    color: var(--text-white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Luces de fondo ambientales */
+body::before, body::after {
+    content: "";
+    position: absolute;
+    width: 450px; height: 450px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    opacity: 0.4;
+}
+body::before { background: var(--neon-red); top: -10%; left: -10%; }
+body::after { background: var(--neon-blue); bottom: -10%; right: -10%; }
+
+.app-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Borde Animado */
+.animated-border {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    border-radius: 15px;
+}
+.animated-border::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(transparent, var(--neon-blue), transparent, var(--neon-red), transparent);
+    animation: rotateBorder 10s linear infinite;
+    z-index: -2;
+}
+.animated-border::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    background-color: var(--primary-bg-container);
+    border-radius: 12px;
+    z-index: -1;
+}
+@keyframes rotateBorder { 100% { transform: rotate(360deg); } }
+
+/* Contenedor Principal */
+.carrito-container {
+    width: 100%;
+    max-width: 700px;
+    padding: 40px;
+}
+
+.carrito-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* Items del Carrito */
+.carrito-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.item-info strong { font-size: 1.2rem; color: #fff; }
+
+/* Controles de Cantidad */
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--neon-blue);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.btn-qty {
+    padding: 5px 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: 0.3s;
+}
+.btn-qty:hover { background: var(--neon-blue); color: #000; }
+
+.qty-number {
+    padding: 0 15px;
+    min-width: 40px;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    border-left: 1px solid rgba(0, 212, 255, 0.2);
+    border-right: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.item-precio {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-red);
+    font-weight: bold;
+    min-width: 100px;
+    text-align: right;
+}
+
+.btn-delete-item {
+    color: var(--neon-red);
+    text-decoration: none;
+    font-size: 1.3rem;
+    transition: 0.3s;
+    margin-left: 10px;
+}
+.btn-delete-item:hover { transform: scale(1.2); text-shadow: 0 0 10px var(--neon-red); }
+
+.total-carrito {
+    margin-top: 30px;
+    text-align: right;
+    font-size: 1.8rem;
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-blue);
+}
+
+/* Botones de Acción */
+.acciones { margin-top: 30px; display: flex; gap: 15px; }
+.btn { flex: 1; text-align: center; padding: 15px; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; font-family: 'Rajdhani'; }
+.btn-volver { background: #555; color: white; }
+.btn-comprar { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
+.btn:hover { transform: translateY(-3px); filter: brightness(1.2); }

@@ -33,7 +33,7 @@ $sql_historial = "SELECT C.id_compra, C.fecha_compra, C.total, C.estado_pago,
                   ORDER BY C.fecha_compra DESC";
 
 $resultado_historial = $conn->query($sql_historial);
-include 'includes/cabecera.php'; 
+include 'includes/header.php'; 
 ?>
 
 <link rel="stylesheet" href="css/usuarios.css">

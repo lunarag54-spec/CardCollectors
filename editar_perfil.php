@@ -13,7 +13,7 @@ $sql = "SELECT nombre, email FROM Usuario WHERE id_usuario = $id_usuario";
 $resultado = $conn->query($sql);
 $usuario = $resultado->fetch_assoc();
 
-include 'includes/cabecera.php'; 
+include 'includes/header.php'; 
 ?>
 
 <link rel="stylesheet" href="assets/css/perfil.css">

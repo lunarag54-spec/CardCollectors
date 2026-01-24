@@ -26,16 +26,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario = $result->fetch_assoc();
 
         // Verificamos la contraseña encriptada
-        if ($password === $usuario['password']) {
-            // Guardamos datos en la sesión
+        if (password_verify($password, $usuario['password'])) {
+            // Si entra aquí, es que la contraseña coincide con el hash
             $_SESSION['id_usuario'] = $usuario['id_usuario'];
             $_SESSION['nombre'] = $usuario['nombre'];
             $_SESSION['rol'] = $usuario['rol'];
 
-            // Redirigimos al index
-            header("Location: index.php");
-            exit();
-        } else {
+        // Redirigimos al index
+        header("Location: index.php");
+        exit();
+    } else {
             $error = "Contraseña incorrecta";
         }
     } else {

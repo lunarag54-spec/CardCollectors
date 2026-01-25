@@ -188,7 +188,7 @@ $resultado = $conn->query($sql);
                             <span class="precio-txt"><?php echo number_format($row['precio'], 2); ?>€</span>
                             
                             <a href="agregar_al_carrito.php?id=<?php echo $row['id_producto']; ?>" class="btn-reclamar">
-                                AÑADIR AL CARRITO
+                                AÑADIR AL CARRO
                             </a>
                         </div>
                     </div>

@@ -14,27 +14,27 @@ $resultado_categorias = $conn->query($query_categorias);
 ?>
 
 <style>
-    /* 1. Forzar el layout para que no se mueva */
+    /* 1. Layout Base */
     main {
         position: relative;
         display: flex !important;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 80vh; /* Asegura que el footer no suba demasiado */
+        min-height: 80vh; 
         padding: 40px 20px;
-        background: #000; /* Fondo negro para que brillen las luces */
+        background: #000; 
         overflow: hidden;
     }
 
-    /* 2. Luces dinámicas mejoradas */
+    /* 2. Luces dinámicas de fondo */
     .cursor-glow-red, .cursor-glow-blue {
         position: fixed;
         width: 500px;
         height: 500px;
         border-radius: 50%;
         filter: blur(100px);
-        z-index: 1; /* Por encima del fondo, debajo de la carta */
+        z-index: 1; 
         opacity: 0.5;
         pointer-events: none;
         top: 0;
@@ -44,10 +44,10 @@ $resultado_categorias = $conn->query($query_categorias);
     .cursor-glow-red { background: radial-gradient(circle, rgba(255, 0, 0, 0.4) 0%, transparent 70%); }
     .cursor-glow-blue { background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%); }
 
-    /* 3. Estabilización de la carta */
+    /* 3. Estética de la Carta de Formulario */
     .card-publicar {
         position: relative;
-        z-index: 10; /* Asegura que esté por encima de las luces */
+        z-index: 10; 
         width: 100%;
         max-width: 600px;
     }
@@ -83,7 +83,7 @@ $resultado_categorias = $conn->query($query_categorias);
         100% { transform: rotate(360deg); }
     }
 
-    /* Formulario y Contraste */
+    /* Formulario */
     .form-content { padding: 40px; color: #fff; }
     .input-group { margin-bottom: 20px; }
     .input-group label { display: block; color: #00d4ff; font-family: 'Orbitron'; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; }
@@ -104,12 +104,12 @@ $resultado_categorias = $conn->query($query_categorias);
 
             <form action="procesar_producto.php" method="POST" enctype="multipart/form-data">
                 <div class="input-group">
-                    <label>Nombre</label>
-                    <input type="text" name="nombre" class="form-control" placeholder="Nombre del coleccionable" required>
+                    <label>Nombre de la Reliquia</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Espada de Plasma" required>
                 </div>
 
                 <div class="input-group">
-                    <label>Imagen del Producto</label>
+                    <label>Imagen del Artefacto</label>
                     <input type="file" name="foto" class="form-control" accept="image/*" required>
                 </div>
 
@@ -137,8 +137,8 @@ $resultado_categorias = $conn->query($query_categorias);
                 </div>
 
                 <div style="display: flex; gap: 10px;">
-                    <button type="submit" style="flex: 2; background: transparent; border: 2px solid #ff0000; color: #ff0000; padding: 14px; cursor: pointer; font-weight: bold; font-family: 'Orbitron'; border-radius: 8px; transition: 0.3s;" onmouseover="this.style.background='#ff0000'; this.style.color='#000'" onmouseout="this.style.background='transparent'; this.style.color='#ff0000'">PUBLICAR</button>
-                    <a href="index.php" style="flex: 1; background: #333; color: #fff; text-align: center; padding: 14px; text-decoration: none; border-radius: 8px; font-weight: bold;">Cerrar</a>
+                    <button type="submit" style="flex: 2; background: transparent; border: 2px solid #ff0000; color: #ff0000; padding: 14px; cursor: pointer; font-weight: bold; font-family: 'Orbitron'; border-radius: 8px; transition: 0.3s;" onmouseover="this.style.background='#ff0000'; this.style.color='#000'" onmouseout="this.style.background='transparent'; this.style.color='#ff0000'">FORJAR RELIQUIA</button>
+                    <a href="admin_productos.php" style="flex: 1; background: #333; color: #fff; text-align: center; padding: 14px; text-decoration: none; border-radius: 8px; font-weight: bold; font-family: 'Orbitron'; font-size: 0.8rem; display: flex; align-items: center; justify-content: center;">CANCELAR</a>
                 </div>
             </form>
         </div>
@@ -146,7 +146,7 @@ $resultado_categorias = $conn->query($query_categorias);
 </div>
 
 <script>
-    // Script específico para mover las luces en esta página
+    // Efecto de seguimiento de luces neón
     document.addEventListener('mousemove', (e) => {
         const glowRed = document.getElementById('glow-red-form');
         const glowBlue = document.getElementById('glow-blue-form');

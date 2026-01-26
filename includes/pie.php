@@ -1,4 +1,6 @@
-</main> <style>
+</main> 
+
+<style>
     /* CONTENEDOR DEL BORDE ANIMADO SUPERIOR DEL FOOTER */
     .footer-border-container {
         margin-top: auto; 
@@ -42,7 +44,7 @@
     /* SECCIÓN DE CONTACTO Y DIRECCIÓN */
     .footer-info {
         margin: 20px 0;
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: #ccc;
         line-height: 1.8;
     }
@@ -57,8 +59,8 @@
 
     .footer-info i {
         color: var(--accent-blue);
-        font-size: 1.1rem;
-        width: 25px;
+        font-size: 1rem;
+        width: 20px;
     }
 
     /* ICONOS DE REDES SOCIALES */
@@ -71,19 +73,19 @@
 
     .social-link {
         color: #fff;
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         transition: all 0.3s ease;
     }
 
     .social-link:hover {
         color: var(--accent-red);
         transform: translateY(-3px);
-        filter: drop-shadow(0 0 10px var(--accent-red));
+        filter: drop-shadow(0 0 8px var(--accent-red));
     }
 
     /* LÍNEA DE COPYRIGHT */
     .copyright {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         color: #444;
         margin-top: 30px;
         text-transform: uppercase;
@@ -101,11 +103,7 @@
             <div class="footer-info">
                 <p>
                     <i class="fas fa-map-marker-alt"></i> 
-                    Calle de las Reliquias, 42 - Sector Neón, CP 28001
-                </p>
-                <p>
-                    <i class="fas fa-phone-alt"></i> 
-                    +34 600 000 000
+                    C. Beatriz Galindo, 6 - 28914 Leganés, Madrid
                 </p>
                 <p>
                     <i class="fas fa-envelope"></i> 
@@ -117,10 +115,11 @@
                 <a href="#" class="social-link" title="Discord"><i class="fab fa-discord"></i></a>
                 <a href="#" class="social-link" title="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="#" class="social-link" title="Twitter / X"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link" title="Facebook"><i class="fab fa-facebook-f"></i></a>
             </div>
 
             <p class="copyright">
-                &copy; <?php echo date("Y"); ?> Card Collector System - Acceso de Usuario Autorizado
+                &copy; <?php echo date("Y"); ?> Card Collector System - Mazo de Coleccionista
             </p>
         </div>
     </div>

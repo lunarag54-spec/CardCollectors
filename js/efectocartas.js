@@ -1,48 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Seleccionamos solo los envoltorios de cartas 3D
-    const cards = document.querySelectorAll('.card-3d-wrapper');
+    // Usamos el selector que coincide con tu estructura PHP
+    const cards = document.querySelectorAll('.card-item');
 
-    cards.forEach(wrapper => {
-        const card = wrapper.querySelector('.card-3d');
+    cards.forEach(item => {
+        const card = item.querySelector('.card-3d');
         if (!card) return;
 
-        wrapper.addEventListener('mousemove', (e) => {
-            const rect = wrapper.getBoundingClientRect();
-            // Posición del ratón dentro de la carta
+        item.addEventListener('mousemove', (e) => {
+            const rect = item.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            
-            // Centro de la carta
+
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-            
-            // Cálculo de rotación (Invertido para que siga al ratón)
-            // Dividimos por 12 para suavizar el ángulo (ajusta este valor a tu gusto)
-            const rotateX = ((y - centerY) / centerY) * -12; 
-            const rotateY = ((x - centerX) / centerX) * 12;
 
-            // Variables para el CSS (posicionamiento de brillos)
-            const percentX = (x / rect.width) * 100;
-            const percentY = (y / rect.height) * 100;
+            // Aumentamos de 15 a 25 para más movimiento
+            const rotateX = ((y - centerY) / centerY) * -25; 
+            const rotateY = ((x - centerX) / centerX) * 25;
 
-            // Aplicamos la transformación 3D
+            // Variables para el brillo (Holo)
+            const px = (x / rect.width) * 100;
+            const py = (y / rect.height) * 100;
+            const angle = Math.atan2(py - 50, px - 50) * (180 / Math.PI) + 90;
+
+            item.style.setProperty('--px', `${px}%`);
+            item.style.setProperty('--py', `${py}%`);
+            item.style.setProperty('--angle', `${angle}deg`);
+
+            // Aplicamos rotación y un ligero zoom
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-            
-            // Movemos el brillo (glare)
-            card.style.setProperty('--x', `${percentX}%`);
-            card.style.setProperty('--y', `${percentY}%`);
-            
-            // Movemos el arcoíris (shine) en dirección opuesta para efecto foil realista
-            card.style.setProperty('--bg-x', `${100 - percentX}%`);
-            card.style.setProperty('--bg-y', `${100 - percentY}%`);
         });
 
-        // Al salir el ratón, la carta vuelve a su posición original
-        wrapper.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-            // Opcional: reiniciar brillo
-            card.style.setProperty('--x', `50%`);
-            card.style.setProperty('--y', `50%`);
+        item.addEventListener('mouseleave', () => {
+            // Retorno suave al estado original
+            card.style.transition = "transform 0.5s ease";
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+            
+            setTimeout(() => {
+                card.style.transition = "transform 0.1s ease-out";
+            }, 500);
         });
     });
 });

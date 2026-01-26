@@ -1,93 +1,110 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
-
 :root {
-    --primary-color: #000000;
     --neon-blue: #00d4ff;
     --neon-red: #ff4444;
-    --text-color: #ffffff;
     --bg-dark: #050505;
 }
 
 body {
     background-color: var(--bg-dark);
-    color: var(--text-color);
-    font-family: 'Rajdhani', sans-serif;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh; /* Permite el scroll */
+    overflow-x: hidden;
+    font-family: 'Rajdhani', sans-serif;
 }
 
-/* ===== BORDES ANIMADOS (Header y Footer) ===== */
-.animated-border {
+/* ARREGLO DE LUCES: pointer-events: none es la clave */
+#glow-red, #glow-blue {
+    position: fixed; width: 500px; height: 500px; border-radius: 50%;
+    filter: blur(100px); opacity: 0.15; pointer-events: none; z-index: 0;
+}
+#glow-red { background: var(--neon-red); }
+#glow-blue { background: var(--neon-blue); }
+
+.scroll-area { position: relative; z-index: 1; padding: 40px 20px; }
+
+.titulo-catalogo {
+    text-align: center; font-family: 'Orbitron'; color: var(--neon-blue);
+    letter-spacing: 4px; margin-bottom: 50px; text-shadow: 0 0 15px rgba(0,212,255,0.5);
+}
+
+/* EL MARCO DE LAS CARTAS */
+.grid-productos {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 35px; max-width: 1400px; margin: 0 auto;
+}
+
+.producto-card-wrapper { perspective: 1000px; }
+
+.producto-card-body {
+    background: rgba(15, 15, 15, 0.8);
+    border: 1px solid rgba(255, 0, 0, 0.1);
+    border-radius: 15px; padding: 15px;
+    transition: transform 0.1s ease-out, border-color 0.3s;
+    transform-style: preserve-3d;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.producto-card-wrapper:hover .producto-card-body {
+    border-color: var(--neon-blue);
+}
+
+.img-container {
+    position: relative; width: 100%; aspect-ratio: 2.5/3.5;
+    border-radius: 10px; overflow: hidden; margin-bottom: 15px;
+}
+
+.img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+
+/* BRILLO REALISTA VMAX */
+.holo-shine {
+    position: absolute; inset: 0; z-index: 2; opacity: 0; transition: 0.3s;
+    background: linear-gradient(calc(var(--angle, 135) * 1deg), 
+                transparent 20%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.4) 50%, 
+                rgba(255,255,255,0.3) 55%, transparent 80%);
+    mix-blend-mode: screen; pointer-events: none;
+}
+.producto-card-wrapper:hover .holo-shine { opacity: 1; }
+
+/* BOTÓN RECLAMAR - ESTILO ROJO NEÓN */
+.btn-reclamar {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: rgba(255, 68, 68, 0.05); /* Fondo sutil rojo */
+    color: var(--neon-red); /* Texto Rojo */
+    border: 1px solid var(--neon-red); /* Borde Rojo */
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    z-index: 1;
 }
 
-.animated-border::before {
-    content: "";
+/* Efecto Hover en Rojo */
+.btn-reclamar:hover {
+    background: var(--neon-red);
+    color: #000; /* Texto negro al resaltar */
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+    transform: translateY(-2px);
+}
+
+/* El efecto de "escáner" que cruza el botón */
+.btn-reclamar::after {
+    content: '';
     position: absolute;
-    top: -150%; left: -50%;
-    width: 200%; height: 400%;
-    background: conic-gradient(transparent, var(--neon-blue), transparent, var(--neon-red), transparent);
-    animation: rotateBorder 10s linear infinite;
-    z-index: -2;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.3); /* Brillo blanco intenso */
+    transform: rotate(30deg);
+    transition: all 0.5s ease;
 }
 
-.animated-border::after {
-    content: "";
-    position: absolute;
-    inset: 3px; /* Grosor del borde */
-    background-color: var(--primary-color);
-    z-index: -1;
+.btn-reclamar:hover::after {
+    left: 120%;
 }
-
-@keyframes rotateBorder { 100% { transform: rotate(360deg); } }
-
-/* ===== LAYOUT ESTRUCTURA ===== */
-.main-header { height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 5%; flex-shrink: 0; }
-.main-footer { padding: 10px 5%; flex-shrink: 0; font-size: 0.8rem; }
-
-.app-container { flex: 1; display: flex; overflow: hidden; }
-
-.sidebar {
-    width: 80px;
-    background: rgba(255,255,255,0.03);
-    border-right: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px 0;
-}
-
-.main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
-.scroll-area { flex: 1; overflow-y: auto; padding: 20px 40px; }
-
-/* ===== CARTAS ===== */
-.grid-productos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 25px;
-}
-
-.producto-card {
-    background: rgba(255,255,255,0.03);
-    border-radius: 15px;
-    padding: 15px;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: 0.3s;
-}
-
-/* LINTERNA / ESCANEO */
-.flashlight-overlay {
-    position: fixed; inset: 0; pointer-events: none; z-index: 9999;
-    background: radial-gradient(circle 200px at var(--x) var(--y), rgba(0,212,255,0.05) 0%, rgba(0,0,0,0.98) 100%);
-    opacity: 0; transition: opacity 0.4s;
-}
-.explorer-active .flashlight-overlay { opacity: 1; }
-
-/* Estilos de Header extras */
-.nav-icon { color: white; text-decoration: none; position: relative; font-size: 1.2rem; }
-.cart-count { background: var(--neon-red); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; position: absolute; top: -10px; right: -10px; }

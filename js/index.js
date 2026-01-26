@@ -1,34 +1,31 @@
 document.addEventListener('mousemove', (e) => {
-    // Luces de fondo
+    // Mover luces de fondo suavemente
     const red = document.getElementById('glow-red');
     const blue = document.getElementById('glow-blue');
+    
     if(red && blue) {
-        red.style.left = (e.clientX - 250) + 'px';
-        red.style.top = (e.clientY - 250) + 'px';
-        blue.style.right = (window.innerWidth - e.clientX - 250) + 'px';
-        blue.style.bottom = (window.innerHeight - e.clientY - 250) + 'px';
+        red.style.transform = `translate(${e.clientX - 200}px, ${e.clientY - 200}px)`;
+        blue.style.transform = `translate(${window.innerWidth - e.clientX - 200}px, ${window.innerHeight - e.clientY - 200}px)`;
     }
 
-    // Coordenadas para la linterna
-    const flashlight = document.querySelector('.flashlight-overlay');
-    if (flashlight) {
-        flashlight.style.setProperty('--x', e.clientX + 'px');
-        flashlight.style.setProperty('--y', e.clientY + 'px');
+    // Efecto 3D en las cartas solo al estar encima
+    const wrapper = e.target.closest('.producto-card-wrapper');
+    if (wrapper) {
+        const body = wrapper.querySelector('.producto-card-body');
+        const rect = wrapper.getBoundingClientRect();
+        
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const rX = (y - rect.height/2) / -10;
+        const rY = (x - rect.width/2) / 10;
+        
+        body.style.transform = `rotateX(${rX}deg) rotateY(${rY}deg)`;
+        
+        // Brillo holográfico dinámico
+        const shine = wrapper.querySelector('.holo-shine');
+        if(shine) {
+            shine.style.background = `radial-gradient(circle at ${(x/rect.width)*100}% ${(y/rect.height)*100}%, rgba(255,255,255,0.3) 0%, transparent 70%)`;
+        }
     }
 });
-
-const btnScanner = document.getElementById('toggle-explorer');
-if (btnScanner) {
-    // Crear el div de la linterna si no existe
-    if (!document.querySelector('.flashlight-overlay')) {
-        const overlay = document.createElement('div');
-        overlay.className = 'flashlight-overlay';
-        document.body.appendChild(overlay);
-    }
-
-    btnScanner.addEventListener('click', () => {
-        const isActive = document.body.classList.toggle('explorer-active');
-        btnScanner.querySelector('.scanner-status').innerText = isActive ? "ON" : "OFF";
-        btnScanner.classList.toggle('active');
-    });
-}

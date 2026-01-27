@@ -16,7 +16,7 @@ $usuario = $resultado->fetch_assoc();
 include 'includes/header.php'; 
 ?>
 
-<link rel="stylesheet" href="assets/css/perfil.css">
+<link rel="stylesheet" href="css/editar_perfil.css">
 
 <main class="contenedor-perfil">
     <div class="edit-card">

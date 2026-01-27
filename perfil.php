@@ -36,7 +36,7 @@ $resultado_historial = $conn->query($sql_historial);
 include 'includes/header.php'; 
 ?>
 
-<link rel="stylesheet" href="css/usuarios.css">
+<link rel="stylesheet" href="css/perfil.css">
 
 <main class="contenedor-perfil">
     <div class="card-usuario">

@@ -34,5 +34,5 @@ if ($check_prod->num_rows > 0) {
 }
 
 // Redirigir de vuelta a la tienda
-header("Location: index.php");
+header("Location: catalogo.php");
 exit();

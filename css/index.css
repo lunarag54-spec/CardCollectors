@@ -1,110 +1,307 @@
 :root {
     --neon-blue: #00d4ff;
     --neon-red: #ff4444;
-    --bg-dark: #050505;
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: #050505;
+    color: white;
     margin: 0;
-    min-height: 100vh; /* Permite el scroll */
-    overflow-x: hidden;
     font-family: 'Rajdhani', sans-serif;
 }
 
-/* ARREGLO DE LUCES: pointer-events: none es la clave */
+/* LUCES */
 #glow-red, #glow-blue {
-    position: fixed; width: 500px; height: 500px; border-radius: 50%;
-    filter: blur(100px); opacity: 0.15; pointer-events: none; z-index: 0;
+    position: fixed; width: 600px; height: 600px; border-radius: 50%;
+    filter: blur(120px); opacity: 0.15; pointer-events: none; z-index: 0;
 }
 #glow-red { background: var(--neon-red); }
 #glow-blue { background: var(--neon-blue); }
 
-.scroll-area { position: relative; z-index: 1; padding: 40px 20px; }
+.home-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
 
-.titulo-catalogo {
-    text-align: center; font-family: 'Orbitron'; color: var(--neon-blue);
-    letter-spacing: 4px; margin-bottom: 50px; text-shadow: 0 0 15px rgba(0,212,255,0.5);
+/* HERO */
+.hero-section { height: 75vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+.glitch-title { font-size: 5rem; font-family: 'Orbitron'; text-shadow: 0 0 20px var(--neon-blue); letter-spacing: 10px; }
+.hero-subtitle { color: #888; font-size: 1.2rem; margin-bottom: 30px; }
+
+.btn-main { padding: 15px 35px; background: var(--neon-blue); color: #000; font-weight: bold; text-decoration: none; font-family: 'Orbitron'; }
+.btn-secondary { padding: 15px 35px; border: 1px solid #fff; color: #fff; text-decoration: none; margin-left: 15px; font-family: 'Orbitron'; transition: 0.3s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+/* BENTO GRID */
+.section-title { font-family: 'Orbitron'; color: var(--neon-blue); text-align: center; margin: 80px 0 40px; }
+.bento-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 250px 250px; gap: 15px; }
+
+.bento-item { 
+    position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); 
+    background-size: cover; background-position: center; text-decoration: none; transition: 0.4s;
 }
 
-/* EL MARCO DE LAS CARTAS */
-.grid-productos {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 35px; max-width: 1400px; margin: 0 auto;
-}
+/* RUTAS DE IMÁGENES - ASEGÚRATE DE QUE EXISTAN */
+.figuras { grid-row: span 2; background-image: url('img/categorias/figuras.png'); }
+.pokemon { background-image: url('img/categorias/pokemon.png'); }
+.magic { background-image: url('img/categorias/magic.png'); }
+.libros { background-image: url('img/categorias/biblioteca.png'); }
+.ver-todo { background-image: url('/img/categorias/categorias.jpg'); }
 
-.producto-card-wrapper { perspective: 1000px; }
+.bento-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 20px; }
+.bento-overlay span { font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.9rem; }
+.bento-item:hover { transform: translateY(-5px); border-color: var(--neon-blue); }
 
-.producto-card-body {
-    background: rgba(15, 15, 15, 0.8);
-    border: 1px solid rgba(255, 0, 0, 0.1);
-    border-radius: 15px; padding: 15px;
-    transition: transform 0.1s ease-out, border-color 0.3s;
-    transform-style: preserve-3d;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
 
-.producto-card-wrapper:hover .producto-card-body {
-    border-color: var(--neon-blue);
-}
+/* SPOTLIGHT GRIAL */
+.grail-section { margin: 100px 0; padding: 50px; background: rgba(255,255,255,0.02); border: 1px solid rgba(0,212,255,0.2); border-radius: 20px; }
+.grail-container { display: flex; align-items: center; gap: 40px; }
+.grail-text { flex: 1; }
+.grail-text h2 { font-family: 'Orbitron'; font-size: 2.5rem; }
+.grail-price { font-size: 2rem; color: var(--neon-blue); margin: 15px 0; }
+.btn-grail { padding: 12px 25px; border: 1px solid var(--neon-blue); color: var(--neon-blue); text-decoration: none; font-family: 'Orbitron'; }
 
-.img-container {
-    position: relative; width: 100%; aspect-ratio: 2.5/3.5;
-    border-radius: 10px; overflow: hidden; margin-bottom: 15px;
-}
+.grail-visual { flex: 1; position: relative; text-align: center; }
+.grail-visual img { max-width: 70%; filter: drop-shadow(0 0 20px var(--neon-blue)); }
+.scanner-line { position: absolute; top: 0; left: 15%; width: 70%; height: 2px; background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); animation: scan 3s infinite linear; }
+@keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
 
-.img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+/* NOVEDADES */
+.news-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.producto-card-body { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; text-align: center; }
+.img-container img { width: 100%; border-radius: 4px; }
 
-/* BRILLO REALISTA VMAX */
-.holo-shine {
-    position: absolute; inset: 0; z-index: 2; opacity: 0; transition: 0.3s;
-    background: linear-gradient(calc(var(--angle, 135) * 1deg), 
-                transparent 20%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.4) 50%, 
-                rgba(255,255,255,0.3) 55%, transparent 80%);
-    mix-blend-mode: screen; pointer-events: none;
-}
-.producto-card-wrapper:hover .holo-shine { opacity: 1; }
-
-/* BOTÓN RECLAMAR - ESTILO ROJO NEÓN */
-.btn-reclamar {
-    display: block;
-    width: 100%;
-    padding: 12px 0;
-    background: rgba(255, 68, 68, 0.05); /* Fondo sutil rojo */
-    color: var(--neon-red); /* Texto Rojo */
-    border: 1px solid var(--neon-red); /* Borde Rojo */
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    letter-spacing: 2px;
-    transition: all 0.3s ease;
+.bento-item {
     position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    background-size: cover;      /* Esto es vital */
+    background-position: center; /* Esto es vital */
+    background-repeat: no-repeat;
+    text-decoration: none;
+    transition: 0.5s;
+    background-color: #111;      /* Color de fondo por si la imagen falla */
+}
+
+/* Solo dejamos las proporciones del grid */
+.figuras { grid-row: span 2; }
+
+/* ... Tus variables y luces de siempre ... */
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 250px 250px;
+    gap: 15px;
+}
+
+.bento-item {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
 }
 
-/* Efecto Hover en Rojo */
+.figuras { grid-row: span 2; } /* Solo definimos el tamaño */
+
+.bento-item:hover {
+    transform: scale(1.02);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+/* El escáner láser */
+.scanner-line {
+    position: absolute;
+    top: 0; left: 10%; width: 80%; height: 2px;
+    background: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue);
+    animation: scan 3s infinite linear;
+    z-index: 2;
+}
+@keyframes scan { 
+    0% { top: 0%; } 
+    100% { top: 100%; } 
+}
+
+/* Animación de entrada */
+.reveal { opacity: 0; transform: translateY(30px); transition: 1s ease; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* --- SECCIÓN NOVEDADES --- */
+.news-section {
+    padding: 80px 0;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    justify-content: center;
+}
+
+/* Tarjeta Estilo Carta TCG */
+.producto-card-wrapper {
+    perspective: 1000px; /* Necesario para el efecto 3D del JS */
+}
+
+.producto-card-body {
+    background: rgba(15, 15, 15, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+    transition: transform 0.1s ease-out, border-color 0.3s ease;
+    overflow: hidden;
+}
+
+.producto-card-body:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.img-container {
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+.nombre-producto {
+    font-family: 'Orbitron';
+    font-size: 1rem;
+    margin: 0;
+    color: #fff;
+}
+
+.cat-txt {
+    font-size: 0.75rem;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.precio-txt {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #fff;
+    margin: 15px 0;
+}
+
+/* Botón Añadir */
+.btn-reclamar {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid var(--neon-red);
+    color: var(--neon-red);
+    text-decoration: none;
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
 .btn-reclamar:hover {
     background: var(--neon-red);
-    color: #000; /* Texto negro al resaltar */
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
-    transform: translateY(-2px);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-red);
 }
 
-/* El efecto de "escáner" que cruza el botón */
-.btn-reclamar::after {
-    content: '';
+/* Brillo Holográfico */
+.holo-shine {
     position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 20%;
-    height: 200%;
-    background: rgba(255, 255, 255, 0.3); /* Brillo blanco intenso */
-    transform: rotate(30deg);
-    transition: all 0.5s ease;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.2) 0%, transparent 60%);
 }
 
-.btn-reclamar:hover::after {
-    left: 120%;
+.producto-card-wrapper:hover .holo-shine {
+    opacity: 1;
+}
+
+/* --- BOTONES CON EFECTO --- */
+.btn-main, .btn-secondary, .btn-reclamar, .btn-grail {
+    position: relative;
+    display: inline-block;
+    padding: 12px 30px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid var(--neon-blue);
+    background: rgba(0, 212, 255, 0.05);
+    color: var(--neon-blue);
+    cursor: pointer;
+}
+
+/* Efecto de llenado al pasar el ratón */
+.btn-main:hover, .btn-reclamar:hover {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-blue);
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: black;
+    box-shadow: 0 0 20px white;
+}
+
+/* --- BENTO GRID PERFECTO --- */
+.bento-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr; /* 1 grande y 2 columnas pequeñas */
+    grid-template-rows: 250px 250px;    /* 2 filas iguales */
+    gap: 20px;
+}
+
+/* El grande: Figuras */
+.figuras {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3; /* Ocupa las dos filas */
+}
+
+/* Los 4 pequeños (idénticos) */
+.pokemon, .magic, .libros, .ver-todo {
+    grid-column: auto;
+    grid-row: auto;
+}
+
+.bento-item {
+    border-radius: 4px; /* Bordes más rectos para estilo técnico */
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.bento-item:hover {
+    border-color: var(--neon-blue);
+    box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+/* --- NOVEDADES SIN 3D --- */
+.producto-card-body {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    text-align: center;
+    /* Eliminamos transformaciones de 3D aquí */
+    transform: none !important; 
 }

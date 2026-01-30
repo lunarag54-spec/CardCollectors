@@ -20,42 +20,47 @@ $resultado = $conn->query($query_carrito);
 if ($resultado->num_rows > 0) {
     $total = 0;
     $items = [];
+
+    // FASE DE VALIDACIÓN (Bucle While)
     while ($row = $resultado->fetch_assoc()) {
-        // Validación de Stock según la Guía Técnica
         if ($row['stock'] < $row['cantidad']) {
-            die("Error: Stock insuficiente para uno de los productos.");
+            // Si entra aquí, el exit() impide que se cree la compra
+            header("Location: carrito.php?error=no_stock");
+            exit();
         }
         $total += $row['precio'] * $row['cantidad'];
-        $items[] = $row;
+        $items[] = $row; // Guardamos los datos para usarlos luego
     }
 
-    // 2. Insertar en tabla Compra
+    // FASE DE ESCRITURA (Si llegamos aquí, es que hay stock de todo)
     $sql_compra = "INSERT INTO Compra (id_usuario, fecha_compra, total, estado_pago) 
                    VALUES ($id_usuario, NOW(), $total, 'pagado')";
     
     if ($conn->query($sql_compra)) {
         $id_compra = $conn->insert_id;
 
+        // Aquí es donde procesas cada producto uno por uno
         foreach ($items as $item) {
             $id_p = $item['id_producto'];
             $cant = $item['cantidad'];
             $precio = $item['precio'];
 
-            // 3. Insertar Detalle
+            // Insertar Detalle de la compra
             $conn->query("INSERT INTO Detalle_compra (id_compra, id_producto, cantidad, precio_unitario) 
                           VALUES ($id_compra, $id_p, $cant, $precio)");
 
-            // 4. Actualizar Stock
+            // Actualizar Stock restando la cantidad comprada
             $conn->query("UPDATE Producto SET stock = stock - $cant WHERE id_producto = $id_p");
         }
 
-        // 5. Vaciar Carrito (Limpieza)
+        // 5. Vaciar Carrito
         $conn->query("DELETE FROM Carrito_Producto WHERE id_carrito = (SELECT id_carrito FROM Carrito WHERE id_usuario = $id_usuario)");
 
-        // Redirigir al éxito (Tu perfil con el historial actualizado)
         header("Location: perfil.php?status=success");
+        exit();
     }
 } else {
     header("Location: carrito.php?error=vacio");
+    exit();
 }
 ?>

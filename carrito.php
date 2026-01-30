@@ -40,6 +40,56 @@ $total_compra = 0;
             margin-bottom: 30px;
             opacity: 0.8;
         }
+        /* --- ESTILOS PARA EL TOAST DE ERROR --- */
+.cyber-toast.error {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: rgba(20, 5, 5, 0.95); /* Fondo rojizo oscuro */
+    border: 2px solid #ff003c;
+    border-left: 6px solid #ff003c;
+    color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    z-index: 10000; /* Prioridad máxima */
+    box-shadow: 0 0 20px rgba(255, 0, 60, 0.5);
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    font-family: 'Rajdhani', sans-serif;
+    animation: slideIn 0.5s ease-out forwards;
+}
+
+.toast-content { display: flex; align-items: center; gap: 15px; }
+.toast-content i { font-size: 2rem; color: #ff003c; text-shadow: 0 0 10px #ff003c; }
+
+.message .title {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: #ff003c;
+    letter-spacing: 1px;
+}
+
+.toast-timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: #ff003c;
+    width: 100%;
+    animation: timer 5s linear forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes timer {
+    from { width: 100%; }
+    to { width: 0%; }
+}
     </style>
 </head>
 <body>
@@ -103,5 +153,26 @@ $total_compra = 0;
 
     <?php include 'includes/pie.php'; ?>
     <script src="js/index.js"></script>
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'no_stock'): ?>
+    <div id="notification" class="cyber-toast error">
+        <div class="toast-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="message">
+                <span class="title">ERROR DE SUMINISTRO</span>
+                <span class="desc">No hay stock suficiente para completar el pedido.</span>
+            </div>
+        </div>
+        <div class="toast-timer"></div>
+    </div>
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('notification');
+            if(toast) {
+                toast.style.transform = 'translateX(150%)';
+                setTimeout(() => toast.remove(), 600);
+            }
+        }, 5000);
+    </script>
+<?php endif; ?>
 </body>
 </html>

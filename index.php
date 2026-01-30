@@ -70,7 +70,7 @@ while($cat = $res_cats->fetch_assoc()) {
                 <span class="label">PIEZA DE ALTO VALOR</span>
                 <h2><?php echo htmlspecialchars($grail['nombre']); ?></h2>
                 <div class="grail-price"><?php echo number_format($grail['precio'], 2); ?>€</div>
-                <a href="detalle_producto.php?id=<?php echo $grail['id_producto']; ?>" class="btn-grail">EXAMINAR</a>
+                <a href="detalle_producto.php?id=<?php echo $grail['id_producto']; ?>" class="btn-reclamar">EXAMINAR</a>
             </div>
             <div class="grail-visual">
                 <div class="scanner-line"></div>
@@ -84,20 +84,22 @@ while($cat = $res_cats->fetch_assoc()) {
     <h2 class="section-title">ÚLTIMAS ADQUISICIONES</h2>
     <div class="news-grid">
         <?php while($row = $res_novedades->fetch_assoc()): ?>
-            <article class="producto-card-wrapper">
-                <div class="producto-card-body">
+         <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>" class="producto-card-wrapper" style="text-decoration: none; color: inherit;">
+                <article class="producto-card-body">
                     <div class="img-container">
                         <img src="img/productos/<?php echo $row['imagen']; ?>" alt="">
                     </div>
                     <div class="info-container">
                         <h3 class="nombre-producto"><?php echo htmlspecialchars($row['nombre']); ?></h3>
                         <div class="precio-txt"><?php echo number_format($row['precio'], 2); ?>€</div>
-                        <a href="agregar_al_carrito.php?id=<?php echo $row['id_producto']; ?>" class="btn-reclamar">
-                            RECLAMAR PIEZA
-                        </a>
+                        
+                        <div class="btn-reclamar">
+                            VER DETALLES
+                        </div>
                     </div>
-                </div>
-            </article>
+                    <div class="holo-shine"></div>
+                </article>
+            </a>
         <?php endwhile; ?>
     </div>
 </section>

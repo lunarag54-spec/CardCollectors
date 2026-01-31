@@ -303,3 +303,40 @@
     font-weight: bold;
     box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
 }
+
+/* --- ESTILO LIMPIO PARA LIBROS --- */
+.libro-item {
+    background: #111;
+    border-radius: 8px;
+    padding: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.libro-portada {
+    width: 100%;
+    aspect-ratio: 2 / 3; /* Proporción típica de libro/cómic */
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.libro-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, transparent 15%); /* Efecto de lomo de libro */
+}
+
+/* LA ANIMACIÓN SIMPLE QUE QUEDA BIEN */
+.libro-item:hover {
+    transform: translateY(-10px); /* Se eleva un poco */
+    box-shadow: 0 10px 25px rgba(0, 212, 255, 0.2); /* Sombra suave azul */
+    border-color: var(--neon-blue);
+}
+
+/* Desactivar scripts de cartas para libros */
+.libro-item a {
+    pointer-events: auto;
+}

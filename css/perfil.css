@@ -185,3 +185,39 @@
     padding: 20px;
     border: 1px dashed #444;
 }
+/* Asegúrate de que este bloque esté en tu CSS del perfil */
+.cyber-toast.success {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #00d4ff;
+    border-left: 5px solid #00ff64; /* Verde neón para éxito */
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    z-index: 99999; /* Muy alto para que nada lo tape */
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    display: flex !important; /* Forzamos a que se muestre */
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 300px;
+    
+    /* Animación simplificada para asegurar que se vea */
+    animation: slideInToast 0.5s ease-out forwards;
+}
+
+@keyframes slideInToast {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* El resto de estilos (iconos, fuentes, etc.) */
+.toast-content { display: flex; align-items: center; gap: 15px; }
+.message .title { display: block; font-family: 'Orbitron', sans-serif; color: #00d4ff; font-size: 0.8rem; }
+.toast-timer { 
+    position: absolute; bottom: 0; left: 0; height: 3px; 
+    background: #00ff64; width: 100%; 
+    animation: timer 5s linear forwards; 
+}
+@keyframes timer { from { width: 100%; } to { width: 0%; } }

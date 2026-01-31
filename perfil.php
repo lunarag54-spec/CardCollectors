@@ -30,7 +30,7 @@ $sql_historial = "SELECT C.id_compra, C.fecha_compra, C.total, C.estado_pago,
                   INNER JOIN Producto P ON DC.id_producto = P.id_producto
                   WHERE C.id_usuario = $id_usuario
                   GROUP BY C.id_compra
-                  ORDER BY C.fecha_compra DESC";
+                  ORDER BY C.fecha_compra DESC, C.id_compra DESC";
 
 $resultado_historial = $conn->query($sql_historial);
 include 'includes/header.php'; 
@@ -102,6 +102,26 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
     </section>
+    <?php if (isset($_GET['status']) && $_GET['status'] == 'success'): ?>
+    <div id="notification" class="cyber-toast success">
+        <div class="toast-content">
+            <i class="fas fa-check-double"></i>
+            <div class="message">
+                <span class="title">TRANSACCIÓN COMPLETADA</span>
+                <span class="desc">Los productos han sido añadidos a tu colección.</span>
+            </div>
+        </div>
+        <div class="toast-timer"></div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('notification');
+            toast.style.transform = 'translateX(120%)';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    </script>
+<?php endif; ?>
 </main>
 
 <?php include 'includes/pie.php'; ?>

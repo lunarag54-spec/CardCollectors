@@ -26,6 +26,39 @@ $usarDisenoLimpio = ($esFigura || $esMagic || $esLibro);
 
 <link rel="stylesheet" href="css/detalle.css">
 
+<style>
+    /* Estilo específico para la visualización del libro en detalle */
+    .libro-visual-static {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .libro-visual-static img {
+        width: 100%;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+
+    /* Pequeño efecto de iluminación suave al pasar el ratón, sin 3D */
+    .libro-visual-static:hover img {
+        transform: scale(1.02);
+    }
+
+    .libro-visual-static::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 10%, transparent 90%, rgba(0,0,0,0.2) 100%);
+        pointer-events: none;
+    }
+</style>
+
 <main class="reliquia-explorer">
     <div class="scan-line"></div>
 

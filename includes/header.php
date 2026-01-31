@@ -110,34 +110,36 @@ $cat_activa = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
         </div>
 
         <nav class="header-mid-nav">
-            <a href="catalogo.php" class="cat-pill <?php echo ($cat_activa == 0) ? 'active' : ''; ?>">TODOS</a>
-            
-            <?php 
-            $res_menu = $conn->query("SELECT * FROM Categoria WHERE id_padre IS NULL");
-            while($cat = $res_menu->fetch_assoc()): 
-                $id_c = $cat['id_categoria'];
-                $res_sub = $conn->query("SELECT * FROM Categoria WHERE id_padre = $id_c");
-                
-                if($res_sub->num_rows > 0): ?>
-                    <div class="dropdown">
-                        <a href="catalogo.php?categoria=<?php echo $id_c; ?>" class="cat-pill <?php echo ($cat_activa == $id_c) ? 'active' : ''; ?>">
-                            <?php echo strtoupper(htmlspecialchars($cat['nombre_categoria'])); ?> <i class="fas fa-caret-down"></i>
+    <a href="catalogo.php" class="cat-pill <?php echo ($cat_activa == 0) ? 'active' : ''; ?>">TODOS</a>
+    
+    <?php 
+    // Selecciona categorías principales (como LIBROS o CARTAS)
+    $res_menu = $conn->query("SELECT * FROM Categoria WHERE id_padre IS NULL");
+    while($cat = $res_menu->fetch_assoc()): 
+        $id_c = $cat['id_categoria'];
+        // Busca si tiene subcategorías (Mangas, Comics, etc.)
+        $res_sub = $conn->query("SELECT * FROM Categoria WHERE id_padre = $id_c");
+        
+        if($res_sub->num_rows > 0): ?>
+            <div class="dropdown">
+                <a href="catalogo.php?categoria=<?php echo $id_c; ?>" class="cat-pill <?php echo ($cat_activa == $id_c) ? 'active' : ''; ?>">
+                    <?php echo strtoupper(htmlspecialchars($cat['nombre_categoria'])); ?> <i class="fas fa-caret-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <?php while($sub = $res_sub->fetch_assoc()): ?>
+                        <a href="catalogo.php?categoria=<?php echo $sub['id_categoria']; ?>">
+                            <?php echo strtoupper(htmlspecialchars($sub['nombre_categoria'])); ?>
                         </a>
-                        <div class="dropdown-content">
-                            <?php while($sub = $res_sub->fetch_assoc()): ?>
-                                <a href="catalogo.php?categoria=<?php echo $sub['id_categoria']; ?>">
-                                    <?php echo strtoupper(htmlspecialchars($sub['nombre_categoria'])); ?>
-                                </a>
-                            <?php endwhile; ?>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <a href="catalogo.php?categoria=<?php echo $id_c; ?>" class="cat-pill <?php echo ($cat_activa == $id_c) ? 'active' : ''; ?>">
-                        <?php echo strtoupper(htmlspecialchars($cat['nombre_categoria'])); ?>
-                    </a>
-                <?php endif; ?>
-            <?php endwhile; ?>
-        </nav>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+        <?php else: ?>
+            <a href="catalogo.php?categoria=<?php echo $id_c; ?>" class="cat-pill <?php echo ($cat_activa == $id_c) ? 'active' : ''; ?>">
+                <?php echo strtoupper(htmlspecialchars($cat['nombre_categoria'])); ?>
+            </a>
+        <?php endif; ?>
+    <?php endwhile; ?>
+</nav>
 
         <nav class="nav-right">
             <a href="admin_productos.php" class="btn-subir-reliquia"><i class="fas fa-plus-circle"></i> GESTIONAR</a>

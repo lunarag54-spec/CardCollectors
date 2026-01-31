@@ -19,66 +19,59 @@ $resultado = $conn->query($sql);
 <link rel="stylesheet" href="css/catalogo.css">
 
 <style>
-    /* --- DISEÑO EXCLUSIVO PARA FIGURAS (SIN RECUADRO, SIN 3D) --- */
-    .figura-item {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* --- ESTILO PARA LIBROS (MANGAS, COMICS, NOVELAS) --- */
+    .libro-item {
+        background: rgba(20, 20, 20, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        overflow: hidden;
     }
 
-    /* Contenedor de la figura que flota */
-    .figura-display-unique {
+    .libro-display {
         position: relative;
-        height: 350px;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        perspective: none !important; /* Quitamos perspectiva 3D */
+        width: 100%;
+        aspect-ratio: 2 / 3; /* Proporción de libro */
+        overflow: hidden;
+        border-radius: 4px;
     }
 
-    /* Imagen de la figura: Sin recuadro, fondo transparente */
-    .figura-standalone {
+    .libro-img {
         width: 100%;
         height: 100%;
-        background-size: contain !important;
-        background-repeat: no-repeat !important;
-        background-position: bottom center !important;
-        z-index: 2;
-        filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.1));
-        transition: transform 0.3s ease, filter 0.3s ease;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.5s ease;
     }
 
-    /* Pedestal de luz neón en el suelo */
-    .neon-pedestal {
-        position: absolute;
-        bottom: 0;
-        width: 140px;
-        height: 20px;
-        background: rgba(0, 212, 255, 0.1);
-        border-radius: 50%;
-        filter: blur(10px);
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        z-index: 1;
-        transform: scaleX(1.5);
-    }
-
-    /* Hover: La figura se ilumina y sube ligeramente, pero sin girar en 3D */
-    .figura-item:hover .figura-standalone {
+    /* La animación simple de hover para libros */
+    .libro-item:hover {
         transform: translateY(-10px);
-        filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5));
+        border-color: var(--neon-blue, #00d4ff) !important;
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
     }
 
-    .figura-item:hover .neon-pedestal {
-        background: rgba(0, 212, 255, 0.3);
-        box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+    .libro-item:hover .libro-img {
+        transform: scale(1.05);
     }
 
-    /* Mantenemos el estilo de las metas de texto */
-    .figura-item .card-meta {
-        background: rgba(10, 10, 10, 0.8);
-        border-top: 1px solid #333;
-        margin-top: 15px;
+    /* --- ESTILO PARA FIGURAS --- */
+    .figura-item { background: transparent !important; border: none !important; box-shadow: none !important; }
+    .figura-display-unique {
+        position: relative; height: 350px; display: flex;
+        align-items: flex-end; justify-content: center;
     }
+    .figura-standalone {
+        width: 100%; height: 100%; background-size: contain !important;
+        background-repeat: no-repeat !important; background-position: bottom center !important;
+        z-index: 2; transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .neon-pedestal {
+        position: absolute; bottom: 0; width: 140px; height: 20px;
+        background: rgba(0, 212, 255, 0.1); border-radius: 50%;
+        filter: blur(10px); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        z-index: 1; transform: scaleX(1.5);
+    }
+    .figura-item:hover .figura-standalone { transform: translateY(-10px); filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5)); }
 </style>
 
 <main class="catalogo-container">
@@ -88,15 +81,38 @@ $resultado = $conn->query($sql);
             $nombre_minus = strtolower($row['nombre']);
             $categoria_nombre = strtolower($row['nombre_categoria']);
             
-            // Detectamos si es una figura
+            // 1. Detectamos si es Libro (ID Padre 9 o ID Categoría 9,3,4,5)
+            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9);
+            
+            // 2. Detectamos si es Figura
             $esFigura = ($row['id_categoria'] == 2 || strpos($categoria_nombre, 'figura') !== false);
             
-            // Lógica original para Magic y Cajas
+            // 3. Lógica para Cartas
             $esMagic = (strpos($categoria_nombre, 'magic') !== false || strpos($nombre_minus, 'magic') !== false);
             $esCaja = (strpos($nombre_minus, 'box') !== false || strpos($nombre_minus, 'caja') !== false);
             $claseImagen = $esCaja ? 'img-contain' : '';
 
-            if ($esFigura): ?>
+            // CASO A: ES LIBRO
+            if ($esLibro): ?>
+                <article class="card-item figura-item">
+                    <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
+                        <div class="figura-display-unique">
+                            <div class="figura-standalone" style="background-image: url('img/productos/<?php echo $img; ?>');"></div>
+                        </div>
+                    </a>
+                    <div class="card-meta">
+                        <h3 class="product-title"><?php echo htmlspecialchars($row['nombre']); ?></h3>
+                        <div class="product-action-panel">
+                            <div class="price-badge">
+                                <span class="price-amount"><?php echo number_format($row['precio'], 2); ?>€</span>
+                            </div>
+                            <a href="agregar_al_carrito.php?id=<?php echo $row['id_producto']; ?>" class="buy-pill">ADQUIRIR +</a>
+                        </div>
+                    </div>
+                </article>
+
+            <?php // CASO B: ES FIGURA
+            elseif ($esFigura): ?>
                 <article class="card-item figura-item">
                     <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
                         <div class="figura-display-unique">
@@ -115,8 +131,8 @@ $resultado = $conn->query($sql);
                     </div>
                 </article>
 
-            <?php else: ?>
-                <?php 
+            <?php // CASO C: ES CARTA (POKÉMON, MAGIC, ETC)
+            else: 
                 $raras = ['vmax', 'ex', 'gx', 'shiny', 'secret', 'full art', 'gold'];
                 $esEspecial = false;
                 foreach($raras as $r) { if(strpos($nombre_minus, $r) !== false) { $esEspecial = true; break; } }
@@ -149,8 +165,8 @@ $resultado = $conn->query($sql);
 </main>
 
 <script>
-    // Script específico para evitar que las figuras ejecuten el JS de movimiento 3D
-    document.querySelectorAll('.figura-item a').forEach(item => {
+    // Evita que figuras y libros ejecuten el JS de movimiento 3D de las cartas
+    document.querySelectorAll('.figura-item a, .libro-item a').forEach(item => {
         item.addEventListener('mousemove', (e) => e.stopPropagation());
     });
 </script>

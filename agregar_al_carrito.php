@@ -32,7 +32,12 @@ if ($check_prod->num_rows > 0) {
     // No está, lo insertamos
     $conn->query("INSERT INTO Carrito_Producto (id_carrito, id_producto, cantidad) VALUES ($id_carrito, $id_producto, 1)");
 }
-
-// Redirigir de vuelta a la tienda
-header("Location: catalogo.php");
+if (isset($_GET['retorno_cat']) && intval($_GET['retorno_cat']) > 0) {
+    $cat = intval($_GET['retorno_cat']);
+    // Te devuelve al catálogo filtrado por la categoría del producto que acabas de comprar
+    header("Location: catalogo.php?categoria=" . $cat);
+} else {
+    // Si no hay categoría (por seguridad), vuelve al catálogo general
+    header("Location: catalogo.php");
+}
 exit();

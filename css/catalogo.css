@@ -340,3 +340,25 @@
 .libro-item a {
     pointer-events: auto;
 }
+
+/* AJUSTE PARA CAJAS MAGIC */
+    /* Cambiamos el color del neón para Magic (opcional, morado místico) */
+    .neon-pedestal.neon-magic {
+        background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.5) 0%, transparent 70%);
+        width: 140px; /* Un poco más ancho para las cajas */
+    }
+
+    .figura-item:hover .neon-pedestal.neon-magic {
+         background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.8) 0%, transparent 70%);
+         box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+    }
+
+    /* Aseguramos que las cajas se vean completas y centradas */
+    .figura-standalone {
+        /* Esto ya lo tenías, pero es VITAL para las cajas */
+        background-size: contain !important; 
+        background-position: bottom center !important;
+        margin-bottom: 5px; /* Pequeño ajuste para que pisen el neón */
+    }
+
+    

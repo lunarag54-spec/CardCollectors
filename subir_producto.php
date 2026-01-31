@@ -130,7 +130,7 @@ $resultado_categorias = $conn->query($query_categorias);
                         <label>Precio (€)</label>
                         <input type="number" name="precio" step="0.01" class="form-control" required>
                     </div>
-                    <div class="input-group resaltado" style="flex:1;">
+                    <div class="input-group resaltado" style="margin-left:5%;">
                         <label>Stock</label>
                         <input type="number" name="stock" value="1" class="form-control" required>
                     </div>

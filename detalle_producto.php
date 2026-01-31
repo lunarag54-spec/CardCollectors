@@ -4,7 +4,6 @@ include 'includes/header.php';
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Traemos también el id_padre para saber si pertenece a la categoría Libros (ID 9)
 $sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
         INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
         WHERE p.id_producto = $id";
@@ -16,8 +15,13 @@ if (!$producto) { header("Location: catalogo.php"); exit(); }
 $img = !empty($producto['imagen']) ? $producto['imagen'] : 'default.jpg';
 $img_especial = !empty($producto['imagen_especial']) ? $producto['imagen_especial'] : null;
 
-// Lógica para detectar si es libro (ID Padre 9 o Categoría 9)
-$esLibro = ($producto['id_padre'] == 9 || $producto['id_categoria'] == 9);
+// --- LÓGICA DE CATEGORÍAS ---
+$esFigura = ($producto['id_categoria'] == 8);
+$esMagic = ($producto['id_categoria'] == 7);
+// Categorías de lectura (Novelas, Mangas, Comics, Libros)
+$esLibro = ($producto['id_padre'] == 9 || $producto['id_categoria'] == 3 || $producto['id_categoria'] == 4|| $producto['id_categoria'] == 5);
+
+$usarDisenoLimpio = ($esFigura || $esMagic || $esLibro);
 ?>
 
 <link rel="stylesheet" href="css/detalle.css">
@@ -60,23 +64,26 @@ $esLibro = ($producto['id_padre'] == 9 || $producto['id_categoria'] == 9);
 
     <div class="layout-premium">
         <div class="visual-vault">
-            <?php if ($esLibro): ?>
-                <div class="libro-visual-static">
-                    <img src="img/productos/<?php echo $img; ?>" alt="<?php echo htmlspecialchars($producto['nombre']); ?>">
+            <?php if ($esFigura || $esMagic): ?>
+                <div class="figura-display-detail animate-float">
+                    <div class="neon-pedestal-large <?php echo $esMagic ? 'neon-magic' : ''; ?>"></div>
+                    <img src="img/productos/<?php echo $img; ?>" class="figura-standalone-img" alt="Figura">
                 </div>
+
+            <?php elseif ($esLibro): ?>
+                <div class="libro-display-container animate-book">
+                    <div class="libro-shelf-glow"></div>
+                    <img src="img/productos/<?php echo $img; ?>" class="libro-img-refined" alt="Portada">
+                </div>
+
             <?php else: ?>
                 <div class="card-stasis" id="cardContainer">
                     <div class="card-3d" id="card3d">
                         <div class="energy-glare"></div>
-                        
                         <div class="card-media" style="background-image: url('img/productos/<?php echo $img; ?>');"></div>
-                        
                         <?php if ($img_especial): ?>
                             <div class="mew-reveal" style="background-image: url('img/productos/<?php echo $img_especial; ?>');"></div>
                         <?php endif; ?>
-
-                        <div class="corner tl"></div><div class="corner tr"></div>
-                        <div class="corner bl"></div><div class="corner br"></div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -103,16 +110,16 @@ $esLibro = ($producto['id_padre'] == 9 || $producto['id_categoria'] == 9);
             </div>
 
             <div class="action-footer">
-                <a href="agregar_al_carrito.php?id=<?php echo $id; ?>" class="pill-button-neon">
-                    ADQUIRIR RELIQUIA
-                </a>
-                <a href="catalogo.php" class="back-link">Volver Atrás</a>
-            </div>
+    <a href="agregar_al_carrito.php?id=<?php echo $id; ?>&retorno_cat=<?php echo $producto['id_categoria']; ?>" class="pill-button-neon">
+        ADQUIRIR RELIQUIA
+    </a>
+    <a href="catalogo.php" class="back-link">Volver Atrás</a>
+</div>
         </div>
     </div>
 </main>
 
-<?php if (!$esLibro): ?>
+<?php if (!$usarDisenoLimpio): ?>
     <script src="js/detalle.js"></script>
 <?php endif; ?>
 

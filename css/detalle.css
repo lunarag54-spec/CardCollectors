@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;600&display=swap');
 
+/* --- ESTILOS BASE Y CONTENEDOR PRINCIPAL --- */
 .reliquia-explorer {
     background-color: #020202;
     min-height: 100vh;
@@ -11,7 +12,6 @@
     color: #fff;
 }
 
-/* Efecto de línea de escaneo moviéndose al fondo */
 .scan-line {
     position: absolute;
     width: 100%; height: 2px;
@@ -32,133 +32,233 @@
     max-width: 1200px;
     margin: 0 auto;
     z-index: 1;
-    gap: 100px;
+    gap: 80px;
     padding: 40px;
+    align-items: center;
 }
 
-/* --- ESTILO DE LA CARTA ACTUALIZADO --- */
-.card-3d {
-    width: 350px; height: 490px;
+/* --- CONTENEDOR VISUAL (IZQUIERDA) --- */
+.visual-vault {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+}
+
+/* --- ESTILO FIGURAS Y MAGIC --- */
+.figura-display-detail {
     position: relative;
-    border-radius: 10px;
-    background: #000;
-    transform-style: preserve-3d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 50px rgba(0,0,0,0.9);
-    overflow: hidden; /* Importante para el brillo */
+    width: 100%;
+    height: 550px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
 }
 
-/* Capa Holográfica idéntica al catálogo */
-.energy-glare {
-    position: absolute; inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    /* Efecto Aurora/Prisma */
-    background: 
-        radial-gradient(circle at var(--px, 50%) var(--py, 50%), rgba(255, 255, 255, 0.4) 0%, transparent 50%),
-        linear-gradient(var(--angle, 135deg), 
-            rgba(255, 0, 0, 0.05) 0%, 
-            rgba(0, 255, 0, 0.05) 50%, 
-            rgba(0, 0, 255, 0.05) 100%);
-    mix-blend-mode: color-dodge;
-    transition: opacity 0.3s;
+.figura-standalone-img {
+    max-height: 90%;
+    max-width: 100%;
+    z-index: 2;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 35px rgba(0,0,0,0.8));
+    transition: transform 0.5s ease;
 }
 
-.card-stasis:hover .energy-glare {
-    opacity: 1;
+.neon-pedestal-large {
+    position: absolute;
+    bottom: 0;
+    width: 350px;
+    height: 30px;
+    background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(12px);
+    z-index: 1;
+    animation: pulseNeon 3s infinite alternate;
 }
 
-.card-media {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    border-radius: 9px;
+.neon-pedestal-large.neon-magic {
+    background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.5) 0%, transparent 70%);
+}
+
+@keyframes pulseNeon {
+    from { opacity: 0.4; transform: scale(1); }
+    to { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* --- ESTILO LIBROS (MANGAS, CÓMICS, NOVELAS) --- */
+.libro-display-container {
+    position: relative;
+    width: 100%;
+    height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.libro-img-refined {
+    max-height: 85%;
+    max-width: 380px; /* Tamaño controlado para que no se vea gigante */
+    z-index: 2;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 15px 15px 40px rgba(0,0,0,0.8);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.libro-shelf-glow {
+    position: absolute;
+    bottom: 50px;
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
     z-index: 1;
 }
 
-/* --- PANEL DE INFORMACIÓN --- */
-.id-tag { color: #ff4444; font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 2px; }
-.main-name { font-family: 'Orbitron'; font-size: 3.5rem; text-transform: uppercase; margin: 10px 0; line-height: 0.9; }
-.category-badge { display: inline-block; padding: 4px 12px; border: 1px solid #333; border-radius: 4px; color: #888; font-size: 0.8rem; }
+/* --- ANIMACIONES --- */
 
-.price-section { margin: 40px 0; }
-.price-val { font-family: 'Orbitron'; font-size: 3rem; font-weight: bold; }
-.price-val small { color: #ff4444; font-size: 1.5rem; }
+/* Animación de flotación suave para Figuras y Magic */
+.animate-float img {
+    animation: floatEffect 4s ease-in-out infinite;
+}
 
-.stock-status { display: flex; align-items: center; gap: 10px; color: #4ade80; font-size: 0.9rem; margin-top: 10px; }
-.pulse-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes floatEffect {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
 
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+/* Animación de inclinación premium para Libros/Mangas */
+.animate-book:hover .libro-img-refined {
+    transform: rotateY(-15deg) rotateX(5deg) scale(1.05);
+    box-shadow: 40px 40px 60px rgba(0,0,0,0.9);
+}
 
-.intel-box { border-top: 1px solid #222; padding-top: 20px; margin-bottom: 50px; }
-.intel-title { font-family: 'Orbitron'; font-size: 0.9rem; color: #555; margin-bottom: 15px; }
-.intel-text { color: #aaa; line-height: 1.8; font-size: 1.1rem; font-weight: 300; }
+/* --- DISEÑO DE CARTA (POKEMON/OTROS) --- */
+.card-stasis {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 2.5 / 3.5;
+}
 
-/* --- BOTÓN PILL NEÓN --- */
-.pill-button-neon {
-    display: block; width: 100%; max-width: 320px;
-    background: transparent;
-    border: 2px solid #ff4444;
-    color: #ff4444;
-    padding: 18px 0;
-    text-align: center;
-    border-radius: 100px; /* Estilo Pill */
+.card-3d {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
+}
+
+.card-media {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* --- PANEL DE DATOS (DERECHA) --- */
+.data-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.id-tag {
     font-family: 'Orbitron';
-    font-weight: bold;
+    color: #ff4444;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+}
+
+.main-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+    margin: 10px 0;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #fff, #888);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    border: 1px solid #444;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.price-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.price-val {
+    font-family: 'Orbitron';
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.price-val small { font-size: 1rem; color: #ff4444; }
+
+.intel-box {
+    background: rgba(255,255,255,0.03);
+    padding: 20px;
+    border-left: 3px solid #ff4444;
+    border-radius: 0 10px 10px 0;
+}
+
+.intel-title {
+    font-family: 'Orbitron';
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    color: #888;
+}
+
+.intel-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+.action-footer {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.pill-button-neon {
+    background: #ff4444;
+    color: #000;
+    padding: 18px 40px;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+    font-family: 'Orbitron';
+    font-weight: 900;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
 }
 
 .pill-button-neon:hover {
-    background: #ff4444;
-    color: #000;
-    box-shadow: 0 0 30px rgba(255, 68, 68, 0.6);
-    transform: scale(1.05);
+    background: #fff;
+    box-shadow: 0 0 35px rgba(255, 255, 255, 0.6);
+    transform: translateY(-3px);
 }
 
-.back-link { display: inline-block; margin-top: 30px; color: #6e6e6e; text-decoration: none; font-size: 0.8rem; transition: 0.3s; }
+.back-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
 .back-link:hover { color: #fff; }
-
-/* --- EFECTO REVELACIÓN DE MEW AZUL --- */
-
-.mew-reveal {
-    position: absolute;
-    inset: 0;
-    z-index: 5;
-    /* Usamos la imagen de Mew Azul que generamos */
-    background-image: url('https://r.jina.ai/i/067f9176371746979201509a2503290b'); 
-    background-size: 75%;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    /* Estado inicial: invisible y pequeño */
-    opacity: 0;
-    transform: scale(0.5) translateZ(0px);
-    filter: drop-shadow(0 0 25px rgba(0, 195, 255, 0.8));
-    transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-    pointer-events: none;
-}
-
-/* Al pasar el ratón por la zona de la carta */
-.card-stasis:hover .mew-reveal {
-    opacity: 1;
-    /* Mew crece y se desplaza hacia adelante en el eje Z */
-    transform: scale(1.15) translateZ(100px);
-}
-
-/* Oscurecemos la carta de fondo para que Mew resalte */
-.card-stasis:hover .card-media {
-    filter: brightness(0.2) saturate(0.3) blur(2px);
-    transition: filter 0.6s ease;
-}
-
-/* Aseguramos que los bordes decorativos sigan visibles */
-.corner {
-    z-index: 6;
-    transition: all 0.5s ease;
-}
-
-.card-stasis:hover .corner {
-    border-color: rgba(0, 195, 255, 0.8);
-    box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
-}

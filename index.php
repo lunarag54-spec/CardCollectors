@@ -34,7 +34,7 @@ while($cat = $res_cats->fetch_assoc()) {
 <main class="home-container">
     <section class="hero-section">
         <div class="hero-content">
-            <h1 class="glitch-title" data-text="THE VAULT">THE VAULT</h1>
+            <h1 class="glitch-title" data-text="THE VAULT">CARD COLLECTORS</h1>
             <p class="hero-subtitle">El santuario del coleccionista profesional.</p>
             <div class="hero-buttons">
                 <a href="catalogo.php" class="btn-main">EXPLORAR BÓVEDA</a>

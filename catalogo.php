@@ -3,9 +3,15 @@ require_once 'includes/conexion.php';
 include 'includes/header.php'; 
 
 $categoria_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
-$where_clause = "";
+
+// Construimos el filtro
+// 1. Si NO hay categoría seleccionada, excluimos la 9 (Exclusivos) por defecto.
+// 2. Si HAY una categoría seleccionada, mostramos solo esa (permitiendo ver la 9 si se llega por enlace).
 if ($categoria_id > 0) {
     $where_clause = " AND (p.id_categoria = $categoria_id OR c.id_padre = $categoria_id)";
+} else {
+    // ESTA ES LA CLAVE: Excluimos la categoría 9 del "Ver Todo"
+    $where_clause = " AND p.id_categoria != 9";
 }
 
 $sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
@@ -19,7 +25,7 @@ $resultado = $conn->query($sql);
 <link rel="stylesheet" href="css/catalogo.css">
 
 <style>
-    /* --- ESTILO PARA LIBROS (MANGAS, COMICS, NOVELAS) --- */
+    /* --- ESTILO PARA LIBROS --- */
     .libro-item {
         background: rgba(20, 20, 20, 0.6) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -28,30 +34,19 @@ $resultado = $conn->query($sql);
     }
 
     .libro-display {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 2 / 3; /* Proporción de libro */
-        overflow: hidden;
-        border-radius: 4px;
+        position: relative; width: 100%; aspect-ratio: 2 / 3;
+        overflow: hidden; border-radius: 4px;
     }
 
     .libro-img {
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        transition: transform 0.5s ease;
+        width: 100%; height: 100%; background-size: cover;
+        background-position: center; transition: transform 0.5s ease;
     }
 
-    /* La animación simple de hover para libros */
     .libro-item:hover {
         transform: translateY(-10px);
         border-color: var(--neon-blue, #00d4ff) !important;
         box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
-    }
-
-    .libro-item:hover .libro-img {
-        transform: scale(1.05);
     }
 
     /* --- ESTILO PARA FIGURAS --- */
@@ -81,18 +76,16 @@ $resultado = $conn->query($sql);
             $nombre_minus = strtolower($row['nombre']);
             $categoria_nombre = strtolower($row['nombre_categoria']);
             
-            // 1. Detectamos si es Libro (ID Padre 9 o ID Categoría 9,3,4,5)
-            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9);
-            
-            // 2. Detectamos si es Figura
+            // Detectamos tipos para aplicar estilos
+            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9); // Nota: si tu cat 9 es exclusiva, esto marcará a Kaito como libro visualmente si entras directo.
             $esFigura = ($row['id_categoria'] == 2 || strpos($categoria_nombre, 'figura') !== false);
             
-            // 3. Lógica para Cartas
+            // Lógica para Cartas
             $esMagic = (strpos($categoria_nombre, 'magic') !== false || strpos($nombre_minus, 'magic') !== false);
             $esCaja = (strpos($nombre_minus, 'box') !== false || strpos($nombre_minus, 'caja') !== false);
             $claseImagen = $esCaja ? 'img-contain' : '';
 
-            // CASO A: ES LIBRO
+            // Renderizado por tipo
             if ($esLibro): ?>
                 <article class="card-item figura-item">
                     <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
@@ -111,8 +104,7 @@ $resultado = $conn->query($sql);
                     </div>
                 </article>
 
-            <?php // CASO B: ES FIGURA
-            elseif ($esFigura): ?>
+            <?php elseif ($esFigura): ?>
                 <article class="card-item figura-item">
                     <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
                         <div class="figura-display-unique">
@@ -131,8 +123,7 @@ $resultado = $conn->query($sql);
                     </div>
                 </article>
 
-            <?php // CASO C: ES CARTA (POKÉMON, MAGIC, ETC)
-            else: 
+            <?php else: 
                 $raras = ['vmax', 'ex', 'gx', 'shiny', 'secret', 'full art', 'gold'];
                 $esEspecial = false;
                 foreach($raras as $r) { if(strpos($nombre_minus, $r) !== false) { $esEspecial = true; break; } }
@@ -165,7 +156,6 @@ $resultado = $conn->query($sql);
 </main>
 
 <script>
-    // Evita que figuras y libros ejecuten el JS de movimiento 3D de las cartas
     document.querySelectorAll('.figura-item a, .libro-item a').forEach(item => {
         item.addEventListener('mousemove', (e) => e.stopPropagation());
     });

@@ -38,7 +38,7 @@ body::after { background: var(--neon-blue); bottom: -10%; right: -10%; }
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 80px;
 }
 
 /* Borde Animado */
@@ -71,6 +71,7 @@ body::after { background: var(--neon-blue); bottom: -10%; right: -10%; }
     width: 100%;
     max-width: 700px;
     padding: 40px;
+    padding-top: 60px;
 }
 
 .carrito-container h1 {

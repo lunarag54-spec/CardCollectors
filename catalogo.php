@@ -2,22 +2,54 @@
 require_once 'includes/conexion.php';
 include 'includes/header.php'; 
 
+// 1. CAPTURA DE PARÁMETROS PARA FILTROS
 $categoria_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
+$orden = isset($_GET['orden']) ? $_GET['orden'] : 'reciente';
 
-// Construimos el filtro
-// 1. Si NO hay categoría seleccionada, excluimos la 9 (Exclusivos) por defecto.
-// 2. Si HAY una categoría seleccionada, mostramos solo esa (permitiendo ver la 9 si se llega por enlace).
+// 2. CONSTRUCCIÓN DE LA CLÁUSULA WHERE (Categorías)
 if ($categoria_id > 0) {
     $where_clause = " AND (p.id_categoria = $categoria_id OR c.id_padre = $categoria_id)";
 } else {
-    // ESTA ES LA CLAVE: Excluimos la categoría 9 del "Ver Todo"
+    // Excluimos la categoría 9 (Exclusivos/Kaito) del "Ver Todo" por defecto
     $where_clause = " AND p.id_categoria != 9";
 }
 
+// 3. LÓGICA DE ORDENAMIENTO (Proviene de filtro.php)
+switch ($orden) {
+    case 'precio_min': 
+        $order_by = "p.precio ASC"; 
+        break;
+    case 'precio_max': 
+        $order_by = "p.precio DESC"; 
+        break;
+    case 'az': 
+        $order_by = "p.nombre ASC"; 
+        break;
+    case 'za': 
+        $order_by = "p.nombre DESC"; 
+        break;
+    default: 
+        $order_by = "p.id_producto DESC"; 
+        break;
+}
+
+// 4. EJECUCIÓN DE LA CONSULTA ÚNICA
 $sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
         INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
         WHERE p.estado = 'activo' AND p.stock > 0 $where_clause 
-        ORDER BY p.id_producto DESC";
+        ORDER BY $order_by";
+
+$resultado = $conn->query($sql);
+
+// 4. EJECUCIÓN DE LA CONSULTA ÚNICA
+// Hemos añadido: AND p.id_producto != 87 para excluir a Kaito globalmente
+$sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
+        INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
+        WHERE p.estado = 'activo' 
+        AND p.stock > 0 
+        AND p.id_producto != 87 
+        $where_clause 
+        ORDER BY $order_by";
 
 $resultado = $conn->query($sql);
 ?>
@@ -32,17 +64,14 @@ $resultado = $conn->query($sql);
         transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         overflow: hidden;
     }
-
     .libro-display {
         position: relative; width: 100%; aspect-ratio: 2 / 3;
         overflow: hidden; border-radius: 4px;
     }
-
     .libro-img {
         width: 100%; height: 100%; background-size: cover;
         background-position: center; transition: transform 0.5s ease;
     }
-
     .libro-item:hover {
         transform: translateY(-10px);
         border-color: var(--neon-blue, #00d4ff) !important;
@@ -69,6 +98,8 @@ $resultado = $conn->query($sql);
     .figura-item:hover .figura-standalone { transform: translateY(-10px); filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5)); }
 </style>
 
+<?php include 'filtro.php'; ?>
+
 <main class="catalogo-container">
     <div class="grid-productos">
         <?php while ($row = $resultado->fetch_assoc()): 
@@ -77,7 +108,7 @@ $resultado = $conn->query($sql);
             $categoria_nombre = strtolower($row['nombre_categoria']);
             
             // Detectamos tipos para aplicar estilos
-            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9); // Nota: si tu cat 9 es exclusiva, esto marcará a Kaito como libro visualmente si entras directo.
+            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9); 
             $esFigura = ($row['id_categoria'] == 2 || strpos($categoria_nombre, 'figura') !== false);
             
             // Lógica para Cartas
@@ -85,7 +116,6 @@ $resultado = $conn->query($sql);
             $esCaja = (strpos($nombre_minus, 'box') !== false || strpos($nombre_minus, 'caja') !== false);
             $claseImagen = $esCaja ? 'img-contain' : '';
 
-            // Renderizado por tipo
             if ($esLibro): ?>
                 <article class="card-item figura-item">
                     <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">

@@ -17,6 +17,13 @@ $sql_novedades = "SELECT p.*, c.nombre_categoria FROM Producto p
                   ORDER BY p.id_producto DESC LIMIT 4";
 $res_novedades = $conn->query($sql_novedades);
 
+// MODIFICACIÓN AQUÍ: Añadimos AND p.id_producto != 87 para que no aparezca en novedades
+$sql_novedades = "SELECT p.*, c.nombre_categoria FROM Producto p 
+                  INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
+                  WHERE p.id_producto != 87
+                  ORDER BY p.id_producto DESC LIMIT 4";
+$res_novedades = $conn->query($sql_novedades);
+
 // 2. Traer categorías con su nueva columna de imagen
 $sql_cats = "SELECT id_categoria, nombre_categoria, imagen_categoria FROM Categoria WHERE id_categoria IN (2, 3, 6, 7)";
 $res_cats = $conn->query($sql_cats);
@@ -38,6 +45,7 @@ while($cat = $res_cats->fetch_assoc()) {
             <p class="hero-subtitle">El santuario del coleccionista profesional.</p>
             <div class="hero-buttons">
                 <a href="catalogo.php" class="btn-main">EXPLORAR BÓVEDA</a>
+                <a href="minijuego.php" class="btn-secondary" style="border-color: #00d4ff; color: #00d4ff;">INICIAR MINIJUEGO</a>
                 <a href="#novedades" class="btn-secondary">VER NOVEDADES</a>
             </div>
         </div>

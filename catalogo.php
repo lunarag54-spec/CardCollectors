@@ -2,34 +2,54 @@
 require_once 'includes/conexion.php';
 include 'includes/header.php'; 
 
-// Captura de Filtros
+// 1. CAPTURA DE PARÁMETROS PARA FILTROS
 $categoria_id = isset($_GET['categoria']) ? intval($_GET['categoria']) : 0;
 $orden = isset($_GET['orden']) ? $_GET['orden'] : 'reciente';
 
-// 1. Lógica de Filtrado por Categoría
-$where_clause = " WHERE p.estado = 'activo' AND p.stock > 0";
+// 2. CONSTRUCCIÓN DE LA CLÁUSULA WHERE (Categorías)
 if ($categoria_id > 0) {
-    $where_clause .= " AND (p.id_categoria = $categoria_id OR c.id_padre = $categoria_id)";
+    $where_clause = " AND (p.id_categoria = $categoria_id OR c.id_padre = $categoria_id)";
+} else {
+    // Excluimos la categoría 9 (Exclusivos/Kaito) del "Ver Todo" por defecto
+    $where_clause = " AND p.id_categoria != 9";
 }
 
-// 2. Lógica de Ordenamiento
+// 3. LÓGICA DE ORDENAMIENTO (Proviene de filtro.php)
 switch ($orden) {
-    case 'vendidos': $sort_sql = "p.ventas DESC"; break; // Requiere columna 'ventas'
-    case 'az':       $sort_sql = "p.nombre ASC"; break;
-    case 'za':       $sort_sql = "p.nombre DESC"; break;
-    case 'precio_min': $sort_sql = "p.precio ASC"; break;
-    case 'precio_max': $sort_sql = "p.precio DESC"; break;
-    case 'antiguo':  $sort_sql = "p.id_producto ASC"; break;
-    case 'reciente': 
-    default:         $sort_sql = "p.id_producto DESC"; break;
+    case 'precio_min': 
+        $order_by = "p.precio ASC"; 
+        break;
+    case 'precio_max': 
+        $order_by = "p.precio DESC"; 
+        break;
+    case 'az': 
+        $order_by = "p.nombre ASC"; 
+        break;
+    case 'za': 
+        $order_by = "p.nombre DESC"; 
+        break;
+    default: 
+        $order_by = "p.id_producto DESC"; 
+        break;
 }
 
-
-
-$sql = "SELECT p.*, c.nombre_categoria FROM Producto p 
+// 4. EJECUCIÓN DE LA CONSULTA ÚNICA
+$sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
         INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
+        WHERE p.estado = 'activo' AND p.stock > 0 $where_clause 
+        ORDER BY $order_by";
+
+$resultado = $conn->query($sql);
+
+// 4. EJECUCIÓN DE LA CONSULTA ÚNICA
+// Hemos añadido: AND p.id_producto != 87 para excluir a Kaito globalmente
+$sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
+        INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
+        WHERE p.estado = 'activo' 
+        AND p.stock > 0 
+        AND p.id_producto != 87 
         $where_clause 
-        ORDER BY $sort_sql";
+        ORDER BY $order_by";
 
 $resultado = $conn->query($sql);
 ?>
@@ -43,41 +63,18 @@ $resultado = $conn->query($sql);
         border: none !important;
         box-shadow: none !important;
     }
-
-    /* Contenedor de la figura que flota */
-    .figura-display-unique {
-        position: relative;
-        height: 350px;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        perspective: none !important; /* Quitamos perspectiva 3D */
+    .libro-display {
+        position: relative; width: 100%; aspect-ratio: 2 / 3;
+        overflow: hidden; border-radius: 4px;
     }
-
-    /* Imagen de la figura: Sin recuadro, fondo transparente */
-    .figura-standalone {
-        width: 100%;
-        height: 100%;
-        background-size: contain !important;
-        background-repeat: no-repeat !important;
-        background-position: bottom center !important;
-        z-index: 2;
-        filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.1));
-        transition: transform 0.3s ease, filter 0.3s ease;
+    .libro-img {
+        width: 100%; height: 100%; background-size: cover;
+        background-position: center; transition: transform 0.5s ease;
     }
-
-    /* Pedestal de luz neón en el suelo */
-    .neon-pedestal {
-        position: absolute;
-        bottom: 0;
-        width: 140px;
-        height: 20px;
-        background: rgba(0, 212, 255, 0.1);
-        border-radius: 50%;
-        filter: blur(10px);
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
-        z-index: 1;
-        transform: scaleX(1.5);
+    .libro-item:hover {
+        transform: translateY(-10px);
+        border-color: var(--neon-blue, #00d4ff) !important;
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
     }
 
     /* Hover: La figura se ilumina y sube ligeramente, pero sin girar en 3D */
@@ -99,6 +96,8 @@ $resultado = $conn->query($sql);
     }
 </style>
 
+<?php include 'filtro.php'; ?>
+
 <main class="catalogo-container">
     <?php include 'filtro.php'; ?>
     <div class="grid-productos">
@@ -107,7 +106,8 @@ $resultado = $conn->query($sql);
             $nombre_minus = strtolower($row['nombre']);
             $categoria_nombre = strtolower($row['nombre_categoria']);
             
-            // Detectamos si es una figura
+            // Detectamos tipos para aplicar estilos
+            $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9); 
             $esFigura = ($row['id_categoria'] == 2 || strpos($categoria_nombre, 'figura') !== false);
             
             // Lógica original para Magic y Cajas
@@ -115,7 +115,25 @@ $resultado = $conn->query($sql);
             $esCaja = (strpos($nombre_minus, 'box') !== false || strpos($nombre_minus, 'caja') !== false);
             $claseImagen = $esCaja ? 'img-contain' : '';
 
-            if ($esFigura): ?>
+            if ($esLibro): ?>
+                <article class="card-item figura-item">
+                    <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
+                        <div class="figura-display-unique">
+                            <div class="figura-standalone" style="background-image: url('img/productos/<?php echo $img; ?>');"></div>
+                        </div>
+                    </a>
+                    <div class="card-meta">
+                        <h3 class="product-title"><?php echo htmlspecialchars($row['nombre']); ?></h3>
+                        <div class="product-action-panel">
+                            <div class="price-badge">
+                                <span class="price-amount"><?php echo number_format($row['precio'], 2); ?>€</span>
+                            </div>
+                            <a href="agregar_al_carrito.php?id=<?php echo $row['id_producto']; ?>" class="buy-pill">ADQUIRIR +</a>
+                        </div>
+                    </div>
+                </article>
+
+            <?php elseif ($esFigura): ?>
                 <article class="card-item figura-item">
                     <a href="detalle_producto.php?id=<?php echo $row['id_producto']; ?>">
                         <div class="figura-display-unique">

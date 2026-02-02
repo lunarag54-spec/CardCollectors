@@ -136,3 +136,12 @@ small {
 .btn-cancelar:hover {
     color: #fff;
 }
+
+/* RESPONSIVE PERFIL */
+@media (max-width: 600px) {
+    .card-usuario, .edit-card { padding: 20px; }
+    .dato-grupo { flex-direction: column; gap: 5px; }
+    .dato-valor { text-align: left; }
+    .seccion-historial { padding: 10px; }
+    .grid-historial { grid-template-columns: 1fr; }
+}

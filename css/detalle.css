@@ -262,3 +262,18 @@
 }
 
 .back-link:hover { color: #fff; }
+
+/* RESPONSIVE DETALLE */
+@media (max-width: 992px) {
+    .layout-premium { 
+        grid-template-columns: 1fr; 
+        gap: 40px; 
+        padding: 20px; 
+    }
+    .figura-display-detail, .libro-display-container { height: 400px; }
+}
+
+@media (max-width: 600px) {
+    .price-section { flex-direction: column; align-items: flex-start; }
+    .main-title { font-size: 2rem; }
+}

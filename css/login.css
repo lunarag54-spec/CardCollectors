@@ -183,3 +183,14 @@ body::after { background: #00d4ff; bottom: -10%; right: -10%; } /* Brillo Azul *
     text-decoration: none;
     font-weight: bold;
 }
+
+/* RESPONSIVE ACCESO */
+@media (max-width: 480px) {
+    body { overflow-y: auto; align-items: flex-start; padding: 20px 0; }
+    .card-wrapper { 
+        width: 95%; 
+        padding: 30px 20px; 
+        margin: auto;
+    }
+    .glitch-access { font-size: 1.5rem; }
+}

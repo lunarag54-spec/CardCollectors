@@ -361,4 +361,14 @@
         margin-bottom: 5px; /* Pequeño ajuste para que pisen el neón */
     }
 
-    
+    /* RESPONSIVE CATALOGO */
+@media (max-width: 768px) {
+    .catalogo-container { padding: 20px 10px; }
+    .grid-productos { 
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+        gap: 15px; 
+    }
+    .product-title { font-size: 0.9rem; }
+    .price-amount { font-size: 0.8rem; }
+    .buy-pill { padding: 5px 10px; font-size: 0.7rem; }
+}

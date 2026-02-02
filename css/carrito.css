@@ -158,3 +158,18 @@ body::after { background: var(--neon-blue); bottom: -10%; right: -10%; }
 .btn-volver { background: #555; color: white; }
 .btn-comprar { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
 .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+
+/* RESPONSIVE CARRITO */
+@media (max-width: 768px) {
+    body { overflow-y: auto; }
+    .carrito-container { padding: 15px; }
+    .item-carrito { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 15px; 
+    }
+    .item-info { margin-left: 0; }
+    .controles-cantidad { justify-content: center; }
+    .carrito-footer { flex-direction: column; gap: 20px; }
+    .btn-checkout { width: 100%; }
+}

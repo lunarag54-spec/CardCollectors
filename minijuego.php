@@ -15,6 +15,7 @@ $id_secreto = $figura ? $figura['id_producto'] : '#';
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bóveda de Reliquias - Minijuego Exclusivo</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
     <style>

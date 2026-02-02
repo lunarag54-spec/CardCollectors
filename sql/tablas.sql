@@ -2,11 +2,11 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 --
--- Base de datos: `tiendacoleccionismo`
+-- Base de datos: `tiendacoleccionism1`
 --
-DROP DATABASE IF EXISTS TiendaColeccionismo; -- Para pruebas, eliminar si ya existe
-CREATE DATABASE IF NOT EXISTS TiendaColeccionismo;
-USE TiendaColeccionismo;
+DROP DATABASE IF EXISTS TiendaColeccionismo1; -- Para pruebas, eliminar si ya existe
+CREATE DATABASE IF NOT EXISTS TiendaColeccionismo1;
+USE TiendaColeccionismo1;
 
 -- --------------------------------------------------------
 

@@ -3,7 +3,7 @@
 $host = "localhost";
 $user = "root";
 $pass = ""; // En XAMPP por defecto está vacío
-$db   = "TiendaColeccionismo1";
+$db   = "TiendaColeccionismo";
 
 // Crear la conexión usando la extensión mysqli
 $conn = new mysqli($host, $user, $pass, $db);

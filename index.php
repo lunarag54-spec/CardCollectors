@@ -1,4 +1,3 @@
-<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <?php
 session_start();
 if (!isset($_SESSION['id_usuario'])) {
@@ -12,13 +11,6 @@ include 'includes/header.php';
 $sql_grail = "SELECT * FROM Producto ORDER BY precio DESC LIMIT 1";
 $res_grail = $conn->query($sql_grail);
 $grail = $res_grail->fetch_assoc();
-
-// MODIFICACIÓN AQUÍ: Añadimos AND p.id_producto != 87 para que no aparezca en novedades
-$sql_novedades = "SELECT p.*, c.nombre_categoria FROM Producto p 
-                  INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
-                  WHERE p.id_producto != 87
-                  ORDER BY p.id_producto DESC LIMIT 4";
-$res_novedades = $conn->query($sql_novedades);
 
 // MODIFICACIÓN AQUÍ: Añadimos AND p.id_producto != 87 para que no aparezca en novedades
 $sql_novedades = "SELECT p.*, c.nombre_categoria FROM Producto p 

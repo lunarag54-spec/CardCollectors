@@ -1,4 +1,3 @@
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php
 require_once 'includes/conexion.php';
 include 'includes/header.php'; 
@@ -34,16 +33,10 @@ switch ($orden) {
         break;
 }
 
-// ... (resto del código anterior igual)
-
 // 4. EJECUCIÓN DE LA CONSULTA ÚNICA
-// Hemos añadido: AND p.id_producto != 87 para excluir a Kaito globalmente
 $sql = "SELECT p.*, c.nombre_categoria, c.id_padre FROM Producto p 
         INNER JOIN Categoria c ON p.id_categoria = c.id_categoria 
-        WHERE p.estado = 'activo' 
-        AND p.stock > 0 
-        AND p.id_producto != 87 
-        $where_clause 
+        WHERE p.estado = 'activo' AND p.stock > 0 $where_clause 
         ORDER BY $order_by";
 
 $resultado = $conn->query($sql);
@@ -52,11 +45,12 @@ $resultado = $conn->query($sql);
 <link rel="stylesheet" href="css/catalogo.css">
 
 <style>
-    /* --- DISEÑO EXCLUSIVO PARA FIGURAS (SIN RECUADRO, SIN 3D) --- */
-    .figura-item {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* --- ESTILO PARA LIBROS --- */
+    .libro-item {
+        background: rgba(20, 20, 20, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        overflow: hidden;
     }
     .libro-display {
         position: relative; width: 100%; aspect-ratio: 2 / 3;
@@ -72,29 +66,29 @@ $resultado = $conn->query($sql);
         box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
     }
 
-    /* Hover: La figura se ilumina y sube ligeramente, pero sin girar en 3D */
-    .figura-item:hover .figura-standalone {
-        transform: translateY(-10px);
-        filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5));
+    /* --- ESTILO PARA FIGURAS --- */
+    .figura-item { background: transparent !important; border: none !important; box-shadow: none !important; }
+    .figura-display-unique {
+        position: relative; height: 350px; display: flex;
+        align-items: flex-end; justify-content: center;
     }
-
-    .figura-item:hover .neon-pedestal {
-        background: rgba(0, 212, 255, 0.3);
-        box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+    .figura-standalone {
+        width: 100%; height: 100%; background-size: contain !important;
+        background-repeat: no-repeat !important; background-position: bottom center !important;
+        z-index: 2; transition: transform 0.3s ease, filter 0.3s ease;
     }
-
-    /* Mantenemos el estilo de las metas de texto */
-    .figura-item .card-meta {
-        background: rgba(10, 10, 10, 0.8);
-        border-top: 1px solid #333;
-        margin-top: 15px;
+    .neon-pedestal {
+        position: absolute; bottom: 0; width: 140px; height: 20px;
+        background: rgba(0, 212, 255, 0.1); border-radius: 50%;
+        filter: blur(10px); box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        z-index: 1; transform: scaleX(1.5);
     }
+    .figura-item:hover .figura-standalone { transform: translateY(-10px); filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.5)); }
 </style>
 
 <?php include 'filtro.php'; ?>
 
 <main class="catalogo-container">
-    <?php include 'filtro.php'; ?>
     <div class="grid-productos">
         <?php while ($row = $resultado->fetch_assoc()): 
             $img = !empty($row['imagen']) ? $row['imagen'] : 'default.jpg';
@@ -105,7 +99,7 @@ $resultado = $conn->query($sql);
             $esLibro = ($row['id_padre'] == 9 || $row['id_categoria'] == 9); 
             $esFigura = ($row['id_categoria'] == 2 || strpos($categoria_nombre, 'figura') !== false);
             
-            // Lógica original para Magic y Cajas
+            // Lógica para Cartas
             $esMagic = (strpos($categoria_nombre, 'magic') !== false || strpos($nombre_minus, 'magic') !== false);
             $esCaja = (strpos($nombre_minus, 'box') !== false || strpos($nombre_minus, 'caja') !== false);
             $claseImagen = $esCaja ? 'img-contain' : '';
@@ -147,8 +141,7 @@ $resultado = $conn->query($sql);
                     </div>
                 </article>
 
-            <?php else: ?>
-                <?php 
+            <?php else: 
                 $raras = ['vmax', 'ex', 'gx', 'shiny', 'secret', 'full art', 'gold'];
                 $esEspecial = false;
                 foreach($raras as $r) { if(strpos($nombre_minus, $r) !== false) { $esEspecial = true; break; } }
@@ -181,8 +174,7 @@ $resultado = $conn->query($sql);
 </main>
 
 <script>
-    // Script específico para evitar que las figuras ejecuten el JS de movimiento 3D
-    document.querySelectorAll('.figura-item a').forEach(item => {
+    document.querySelectorAll('.figura-item a, .libro-item a').forEach(item => {
         item.addEventListener('mousemove', (e) => e.stopPropagation());
     });
 </script>

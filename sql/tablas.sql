@@ -1,18 +1,4 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
---
--- Base de datos: `tiendacoleccionism1`
---
-DROP DATABASE IF EXISTS TiendaColeccionismo1; -- Para pruebas, eliminar si ya existe
-CREATE DATABASE IF NOT EXISTS TiendaColeccionismo1;
-USE TiendaColeccionismo1;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `administrador`
---
+CREATE DATABASE tiendacoleccionismo;
 
 CREATE TABLE `administrador` (
   `id_admin` int(11) NOT NULL,
@@ -44,7 +30,8 @@ CREATE TABLE `carrito` (
 
 INSERT INTO `carrito` (`id_carrito`, `id_usuario`, `total`) VALUES
 (1, 2, 0.00),
-(2, 1, 0.00);
+(2, 1, 0.00),
+(3, 3, 0.00);
 
 -- --------------------------------------------------------
 
@@ -57,16 +44,6 @@ CREATE TABLE `carrito_producto` (
   `id_producto` int(11) NOT NULL,
   `cantidad` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Relación de muchos a muchos entre carritos y productos';
-
---
--- Volcado de datos para la tabla `carrito_producto`
---
-
-INSERT INTO `carrito_producto` (`id_carrito`, `id_producto`, `cantidad`) VALUES
-(2, 12, 1),
-(2, 14, 1),
-(2, 46, 1),
-(2, 59, 2);
 
 -- --------------------------------------------------------
 
@@ -88,12 +65,13 @@ CREATE TABLE `categoria` (
 
 INSERT INTO `categoria` (`id_categoria`, `nombre_categoria`, `tipo_libro`, `id_padre`, `imagen_categoria`) VALUES
 (1, 'Cartas', NULL, NULL, NULL),
-(3, 'Libros', 'Manga', NULL, 'categorias.jpg'),
-(4, 'Libros', 'Comic', NULL, NULL),
-(5, 'Libros', 'Novela', NULL, NULL),
+(3, 'MANGAS', 'Manga', 9, 'categorias.jpg'),
+(4, 'COMICS', 'Comic', 9, NULL),
+(5, 'NOVELAS', 'Novela', 9, NULL),
 (6, 'CARTAS POKEMÓN', NULL, 1, 'categoria_pokemon.png'),
 (7, 'CARTAS MAGIC', NULL, 1, 'categoria_magic.png'),
-(8, 'FIGURAS COLECCIONABLES', NULL, NULL, 'categoria_figuras.png');
+(8, 'FIGURAS COLECCIONABLES', NULL, NULL, 'categoria_figuras.png'),
+(9, 'LIBROS', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -109,6 +87,17 @@ CREATE TABLE `compra` (
   `estado_pago` enum('pendiente','pagado','cancelado') DEFAULT 'pendiente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Histórico de pedidos realizados por los usuarios';
 
+--
+-- Volcado de datos para la tabla `compra`
+--
+
+INSERT INTO `compra` (`id_compra`, `id_usuario`, `fecha_compra`, `total`, `estado_pago`) VALUES
+(1, 1, '2026-02-02', 870.00, 'pagado'),
+(2, 3, '2026-02-02', 1759.00, 'pagado'),
+(3, 1, '2026-02-23', 70060.00, 'pagado'),
+(4, 1, '2026-02-23', 12680.00, 'pagado'),
+(5, 1, '2026-02-24', 25000.00, 'pagado');
+
 -- --------------------------------------------------------
 
 --
@@ -122,6 +111,22 @@ CREATE TABLE `detalle_compra` (
   `cantidad` int(11) NOT NULL,
   `precio_unitario` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Desglose de productos incluidos en cada compra';
+
+--
+-- Volcado de datos para la tabla `detalle_compra`
+--
+
+INSERT INTO `detalle_compra` (`id_detalle`, `id_compra`, `id_producto`, `cantidad`, `precio_unitario`) VALUES
+(1, 1, 13, 1, 400.00),
+(2, 1, 84, 6, 60.00),
+(3, 1, 85, 1, 110.00),
+(4, 2, 60, 1, 1759.00),
+(5, 3, 6, 1, 70000.00),
+(6, 3, 84, 1, 60.00),
+(7, 4, 59, 1, 12500.00),
+(8, 4, 83, 1, 45.00),
+(9, 4, 86, 1, 135.00),
+(10, 5, 58, 1, 25000.00);
 
 -- --------------------------------------------------------
 
@@ -165,14 +170,14 @@ INSERT INTO `producto` (`id_producto`, `nombre`, `descripcion`, `imagen`, `id_ca
 (3, 'Charizard 1st Edition Shadowless', 'El icono máximo de los 90. Versión sin sombra en el borde del arte, extremadamente rara.', 'charizard.jpg', 6, 420000.00, 1, 'activo', NULL, NULL),
 (4, 'Lugia 1st Edition Neo Genesis', 'La joya de plata. Casi imposible de encontrar en estado perfecto por su brillo holográfico delicado.', 'lugia.jpg', 6, 144000.00, 1, 'activo', NULL, NULL),
 (5, 'Rayquaza Gold Star', 'Proveniente de la expansión EX Deoxys. Representa al dragón legendario en su forma variocolor (shiny).', 'rayquaza.jpg', 6, 45000.00, 1, 'activo', NULL, NULL),
-(6, 'Umbreon Gold Star', 'Una de las cartas promocionales de Eevee-lutions más deseadas de la Pop Series 5.', 'umbreon.jpg', 6, 70000.00, 1, 'activo', NULL, NULL),
+(6, 'Umbreon Gold Star', 'Una de las cartas promocionales de Eevee-lutions más deseadas de la Pop Series 5.', 'umbreon.jpg', 6, 70000.00, 0, 'activo', NULL, NULL),
 (7, 'Tropical Wind (Hawaii 2001)', 'Carta promocional exclusiva del Tropical Mega Battle celebrado en Hawaii.', 'Tropical.png', 6, 65000.00, 1, 'activo', NULL, NULL),
 (8, 'Mario Pikachu', 'Crossover épico lanzado solo en Japón. Pikachu luciendo el traje del fontanero más famoso.', 'MarioPikachu.jpg', 6, 15000.00, 2, 'activo', NULL, NULL),
 (9, 'Espeon Gold Star', 'Al igual que Umbreon, una pieza de arte minimalista y extremadamente difícil de conseguir.', 'Espeon.jpg', 6, 40000.00, 1, 'activo', NULL, NULL),
 (10, 'Gengar Skyridge Holo', 'Considerada por muchos la ilustración más atmosférica y técnica de Gengar en el TCG.', 'Gengar.jpg', 6, 5000.00, 3, 'activo', NULL, NULL),
 (11, 'Umbreon VMAX Alt Art', 'Conocida como \"Moonbreon\". La carta más deseada de la era moderna, con un arte espectacular de Umbreon alcanzando la luna.', 'umbreonvamx.jpg', 6, 950.00, 1, 'activo', NULL, NULL),
 (12, 'Giratina V (Alt Art)', 'De la expansión Origen Perdido. Su arte abstracto y detallado del Mundo Distorsión es una obra maestra técnica.', 'giratina.jpg', 6, 450.00, 1, 'activo', NULL, NULL),
-(13, 'Rayquaza VMAX (Alt Art)', 'El guardián de los cielos en una de las ilustraciones más detalladas jamás impresas en la serie Cielos Evolutivos.', 'rayquazavmax.jpg', 6, 400.00, 1, 'activo', NULL, NULL),
+(13, 'Rayquaza VMAX (Alt Art)', 'El guardián de los cielos en una de las ilustraciones más detalladas jamás impresas en la serie Cielos Evolutivos.', 'rayquazavmax.jpg', 6, 400.00, 0, 'activo', NULL, NULL),
 (14, 'Charizard ex (Shiny SIR)', 'De Destinos de Paldea. El Charizard Shiny en su forma Teracristal. Un efecto visual de diamantes y fuego negro.', 'charizardex.jpg', 6, 250.00, 2, 'activo', NULL, 'charizardex3d.png'),
 (15, 'Mew ex (Bubblegum SIR)', 'Una de las cartas más bonitas y coloridas de la era actual, con Mew flotando entre burbujas doradas.', 'mew.jpg', 6, 120.00, 3, 'activo', NULL, 'mew3d.png'),
 (16, 'Black Lotus - Alpha Edition', 'La carta más icónica de Magic. En estado Alpha y graduada, es el santo grial de cualquier coleccionista.', 'black_lotus.png', 7, 550000.00, 1, 'activo', 1, NULL),
@@ -202,9 +207,36 @@ INSERT INTO `producto` (`id_producto`, `nombre`, `descripcion`, `imagen`, `id_ca
 (55, 'Mewtwo & Mew 1/8 - Kotobukiya ArtFX', 'Estatua clásica que muestra el duelo eterno. Acabados dinámicos y gran fidelidad al diseño original.', 'mewtwo_mew.png', 8, 210.00, 8, 'activo', 1, NULL),
 (56, 'Behelit Skull 1/4 - Berserk (With Light)', 'Del maestro Kentaro Miura. El cráneo con el Behelit, incluye iluminación ambiental roja.', 'behelit_berserk.png', 8, 410.00, 6, 'activo', 1, NULL),
 (57, 'Motoko Kusanagi 1/4 - Ghost in the Shell', 'Estatua definitiva de la Mayor. Estética ciberpunk pura con cables de silicona realistas.', 'motoko_ghost.png', 8, 820.90, 2, 'activo', 1, NULL),
-(58, 'Astro Boy Mechanical Clear - Real Size', 'Figura de 135cm que muestra los componentes internos del robot más famoso del anime.', 'astroboy_mechanical.png', 8, 25000.00, 1, 'activo', 1, NULL),
-(59, 'Gundam RX-78-2 Gold Version', 'Edición conmemorativa bañada en oro. El Mobile Suit original en formato de lujo extremo.', 'gundam_gold.png', 8, 12500.00, 1, 'activo', 1, NULL),
-(60, 'Ellie & Joel - The Last of Us Part II Statue', 'Estatua de resina premium de 60cm. Hiperrealismo en rostros y texturas de ropa.', 'tlou_statue.png', 8, 1759.00, 3, 'activo', 1, NULL);
+(58, 'Astro Boy Mechanical Clear - Real Size', 'Figura de 135cm que muestra los componentes internos del robot más famoso del anime.', 'astroboy_mechanical.png', 8, 25000.00, 0, 'activo', 1, NULL),
+(59, 'Gundam RX-78-2 Gold Version', 'Edición conmemorativa bañada en oro. El Mobile Suit original en formato de lujo extremo.', 'gundam_gold.png', 8, 12500.00, 0, 'activo', 1, NULL),
+(60, 'Ellie & Joel - The Last of Us Part II Statue', 'Estatua de resina premium de 60cm. Hiperrealismo en rostros y texturas de ropa.', 'tlou_statue.png', 8, 1759.00, 2, 'activo', 1, NULL),
+(61, 'Action Comics #1', 'La primera aparición de Superman (1938). Considerado el cómic más importante de la historia y el inicio de la Edad de Oro.', 'action_comics_1.jpg', 4, 3250000.00, 1, 'activo', 1, NULL),
+(63, 'Amazing Fantasy #15', 'Primera aparición de Spider-Man (1962). La joya de la corona de Marvel y el debut del héroe más icónico de Stan Lee.', 'amazing_15.jpg', 4, 1100000.00, 1, 'activo', 1, NULL),
+(64, 'Marvel Comics #1', 'El inicio del universo Marvel (1939). Presenta a la Antorcha Humana original y a Namor el Sub-Marinero.', 'marvel_1.jpg', 4, 1200000.00, 1, 'activo', 1, NULL),
+(65, 'Superman #1', 'El primer número de la serie propia del Hombre de Acero (1939). Una de las piezas más buscadas por coleccionistas.', 'superman_1.jpg', 4, 500000.00, 1, 'activo', 1, NULL),
+(66, 'All-Star Comics #8', 'Origen y primera aparición de Wonder Woman (1941). El debut de la heroína más famosa del mundo.', 'all_star_8.jpg', 4, 930000.00, 2, 'activo', 1, NULL),
+(67, 'Batman #1', 'Primer número de la serie en solitario de Batman (1940). Incluye las primeras apariciones del Joker y Catwoman.', 'batman_1.webp', 4, 1500000.00, 1, 'activo', 1, NULL),
+(68, 'X-Men #1', 'El debut de los mutantes originales de Marvel (1963). Stan Lee y Jack Kirby presentan a Magneto y los X-Men.', 'xmen_1.webp', 4, 490000.00, 1, 'activo', 1, NULL),
+(69, 'Flash Comics #1', 'Primera aparición de Jay Garrick (Flash) y Hawkman (1940). Un pilar de la historia de la velocidad en los cómics.', 'flash_1.jpg', 4, 450000.00, 1, 'activo', 1, NULL),
+(70, 'Tales of Suspense #39', 'La primera aparición de Iron Man (1963). Tony Stark construye su armadura original gris en este número histórico.', 'tales_39.jpg', 4, 375000.00, 1, 'activo', 1, NULL),
+(71, 'Akira - Edición 35 Aniversario', 'Cofre exclusivo con los 6 volúmenes en tapa dura. La obra maestra de Katsuhiro Otomo que revolucionó el cyberpunk.', 'akira_boxset.png', 3, 150.00, 5, 'activo', 1, NULL),
+(72, 'Berserk: Deluxe Edition Vol. 1', 'Edición de lujo en gran formato y tapa de cuero. El inicio de la épica oscura de Guts creada por Kentaro Miura.', 'berserk_deluxe.jpg', 3, 50.00, 10, 'activo', 1, NULL),
+(73, 'One Piece #1 - Gold Foil Edition', 'Edición extremadamente rara con el logo en dorado. El inicio de la aventura de Luffy en su versión más buscada.', 'one_piece_gold.jpg', 3, 450.00, 1, 'activo', 1, NULL),
+(74, 'Uzumaki - Junji Ito (Hardcover)', 'Recopilatorio integral de la obra más perturbadora de Junji Ito. Una pieza esencial del terror japonés.', 'uzumaki_integral.jpg', 3, 35.00, 15, 'activo', 1, NULL),
+(75, 'Dragon Ball #1 (1984 First Print)', 'Primera impresión japonesa original. El origen de la leyenda de Goku tal como se publicó por primera vez.', 'dragonball_1.webp', 3, 800.00, 1, 'activo', 1, NULL),
+(76, 'Nausicaä del Valle del Viento', 'Cofre con los dos volúmenes integrales escritos y dibujados por Hayao Miyazaki. Una joya del estudio Ghibli.', 'nausicaa_box.webp', 3, 75.00, 4, 'activo', 1, NULL),
+(77, 'Vagabond - VizBig Edition #1', 'Edición de gran tamaño con páginas a color del arte hiperrealista de Takehiko Inoue sobre Miyamoto Musashi.', 'vagabond_viz.jpg', 3, 30.00, 8, 'activo', 1, NULL),
+(78, 'Neon Genesis Evangelion: Collector Edition', 'Volumen 1 de la nueva edición coleccionista con acabados premium y contenido adicional del final de la serie.', 'evangelion_coll.jpeg', 3, 25.00, 20, 'activo', 1, NULL),
+(79, 'Harry Potter y la Piedra Filosofal', 'Primera edición británica (Bloomsbury). El inicio del fenómeno mundial en su estado más puro y coleccionable.', 'hp_philosopher_1st.png', 5, 4500.00, 1, 'activo', 1, NULL),
+(80, 'El Hobbit - Edición Facsímil', 'Reproducción exacta de la primera edición de 1937 con las ilustraciones originales de J.R.R. Tolkien.', 'hobbit_facsimile.png', 5, 120.00, 3, 'activo', 1, NULL),
+(81, 'El Resplandor - Edición Limitada', 'Edición de lujo firmada por Stephen King con ilustraciones inéditas y encuadernación en tela de alta calidad.', 'shining_limited.png', 5, 850.00, 1, 'activo', 1, NULL),
+(82, 'Drácula (1897) - Archivo Histórico', 'Réplica de lujo de la primera edición de Bram Stoker. Un pilar de la literatura gótica con acabados en cuero.', 'dracula_deluxe.png', 5, 95.00, 5, 'activo', 1, NULL),
+(83, '1984 - Edición Ilustrada', 'Obra maestra de George Orwell en una edición especial con arte conceptual distópico y papel libre de ácido.', '1984_illustrated.png', 5, 45.00, 9, 'activo', 1, NULL),
+(84, 'El Principito - Edición Aniversario', 'Cofre especial con bocetos originales del autor y una cubierta de lino azul noche con detalles en pan de oro.', 'principito_gold.png', 5, 60.00, 0, 'activo', 1, NULL),
+(85, 'Dune - Edición Centenario', 'Tapa dura con bordes pintados y mapas detallados de Arrakis. La edición definitiva para los fans de la ciencia ficción.', 'dune_centennial.png', 5, 110.00, 3, 'activo', 1, NULL),
+(86, 'Sherlock Holmes: Canon Completo', 'Volumen masivo que recopila todos los casos de Arthur Conan Doyle con grabados originales de la revista Strand.', 'sherlock_complete.png', 5, 135.00, 1, 'activo', 1, NULL),
+(87, 'Kaito, el Coleccionista Arcano', 'Figura legendaria de edición limitada. Representa la maestría total sobre las reliquias. Obtenido mediante la sincronización del Núcleo de Energía.', 'figura_exclusiva1.png', 9, 0.00, 100, 'activo', 1, NULL),
+(88, 'Espada', '', 'prod_u1_Espada_1770025384.png', 1, 1000.00, 1, 'inactivo', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -223,10 +255,12 @@ CREATE TABLE `usuario` (
 --
 -- Volcado de datos para la tabla `usuario`
 --
--- admin -> admin123, mario 1234
+
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `password`, `rol`) VALUES
 (1, 'Administrador', 'admin@tienda.com', '$2y$10$0kA8FKlhTHivTn53ZMq0ieNx/eebl89hNUOBYCZpsRmiLVXTGhHDK', 'admin'),
-(2, 'Mario', 'mariogalvezfuentes10@gmail.com', '$2y$10$8W3nLq7F4M.uH.E9pG9u9eD8S8S8S8S8S8S8S8S8S8S8S8S8S8S8S', 'usuario');
+(2, 'Mario', 'mariogalvezfuentes10@gmail.com', '1234', 'usuario'),
+(3, 'mario galvez', 'mario@gmail.com', '$2y$10$FhE0mykY5LnsVDF7AZDcT.Fdtw5m/5ZwRB/MklxoVa.MlQsEqiSqu', ''),
+(4, 'mario', 'mario1@gmail.com', '$2y$10$/CAfBeGPxl925.gE/JGOH.7DbNHcFjdjSFgePZjn5jxgiMeJ8f7y.', '');
 
 --
 -- Índices para tablas volcadas
@@ -310,25 +344,25 @@ ALTER TABLE `administrador`
 -- AUTO_INCREMENT de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `categoria`
 --
 ALTER TABLE `categoria`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `compra`
 --
 ALTER TABLE `compra`
-  MODIFY `id_compra` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_compra` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_compra`
 --
 ALTER TABLE `detalle_compra`
-  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `libros`
@@ -340,13 +374,13 @@ ALTER TABLE `libros`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id_producto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Restricciones para tablas volcadas
